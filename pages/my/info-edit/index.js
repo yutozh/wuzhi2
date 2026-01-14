@@ -1,36 +1,37 @@
-import request from '~/api/request';
-import { areaList } from './areaData.js';
+import request from "~/api/request";
+import { areaList } from "./areaData.js";
 
 Page({
   data: {
     personInfo: {
-      name: '',
+      name: "",
       gender: 0,
-      birth: '',
+      birth: "",
       address: [],
-      introduction: '',
+      introduction: "",
       photos: [],
     },
     genderOptions: [
       {
-        label: '男',
+        label: "男",
         value: 0,
       },
       {
-        label: '女',
+        label: "女",
         value: 1,
       },
       {
-        label: '保密',
+        label: "保密",
         value: 2,
       },
     ],
     birthVisible: false,
-    birthStart: '1970-01-01',
-    birthEnd: '2025-03-01',
+    birthStart: "1970-01-01",
+    birthEnd: "2025-03-01",
     birthTime: 0,
-    birthFilter: (type, options) => (type === 'year' ? options.sort((a, b) => b.value - a.value) : options),
-    addressText: '',
+    birthFilter: (type, options) =>
+      type === "year" ? options.sort((a, b) => b.value - a.value) : options,
+    addressText: "",
     addressVisible: false,
     provinces: [],
     cities: [],
@@ -48,7 +49,7 @@ Page({
   },
 
   getPersonalInfo() {
-    request('/api/genPersonalInfo').then((res) => {
+    request("/api/genPersonalInfo").then((res) => {
       this.setData(
         {
           personInfo: res.data.data,
@@ -58,20 +59,23 @@ Page({
           this.setData({
             addressText: `${areaList.provinces[personInfo.address[0]]} ${areaList.cities[personInfo.address[1]]}`,
           });
-        },
+        }
       );
     });
   },
 
   getAreaOptions(data, filter) {
-    const res = Object.keys(data).map((key) => ({ value: key, label: data[key] }));
-    return typeof filter === 'function' ? res.filter(filter) : res;
+    const res = Object.keys(data).map((key) => ({
+      value: key,
+      label: data[key],
+    }));
+    return typeof filter === "function" ? res.filter(filter) : res;
   },
 
   getCities(provinceValue) {
     return this.getAreaOptions(
       areaList.cities,
-      (city) => `${city.value}`.slice(0, 2) === `${provinceValue}`.slice(0, 2),
+      (city) => `${city.value}`.slice(0, 2) === `${provinceValue}`.slice(0, 2)
     );
   },
 
@@ -97,7 +101,7 @@ Page({
     this.setData({
       [`${mode}Visible`]: true,
     });
-    if (mode === 'address') {
+    if (mode === "address") {
       const cities = this.getCities(this.data.personInfo.address[0]);
       this.setData({ cities });
     }
@@ -117,9 +121,9 @@ Page({
     this.setData({
       [`personInfo.${mode}`]: value,
     });
-    if (mode === 'address') {
+    if (mode === "address") {
       this.setData({
-        addressText: label.join(' '),
+        addressText: label.join(" "),
       });
     }
   },
@@ -132,15 +136,15 @@ Page({
   },
 
   onNameChange(e) {
-    this.personInfoFieldChange('name', e);
+    this.personInfoFieldChange("name", e);
   },
 
   onGenderChange(e) {
-    this.personInfoFieldChange('gender', e);
+    this.personInfoFieldChange("gender", e);
   },
 
   onIntroductionChange(e) {
-    this.personInfoFieldChange('introduction', e);
+    this.personInfoFieldChange("introduction", e);
   },
 
   onPhotosRemove(e) {
@@ -149,21 +153,21 @@ Page({
 
     photos.splice(index, 1);
     this.setData({
-      'personInfo.photos': photos,
+      "personInfo.photos": photos,
     });
   },
 
   onPhotosSuccess(e) {
     const { files } = e.detail;
     this.setData({
-      'personInfo.photos': files,
+      "personInfo.photos": files,
     });
   },
 
   onPhotosDrop(e) {
     const { files } = e.detail;
     this.setData({
-      'personInfo.photos': files,
+      "personInfo.photos": files,
     });
   },
 

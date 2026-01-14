@@ -19,7 +19,88 @@
       </view>
     </view>
 
-    <t-tabs defaultValue="recommend">
+    <!-- 搜索框 -->
+    <view class="relative mb-4 w-full">
+      <input
+        value="{{searchQuery}}"
+        type="text"
+        placeholder="搜索物品..."
+        class=" bg-white rounded-2xl px-4 py-3 pl-12 text-gray-900 border-none shadow-sm"
+        bindinput="onSearchInput"
+      />
+      <text class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</text>
+    </view>
+
+    <!-- 分类筛选 -->
+    <scroll-view class="flex gap-3 mb-6 overflow-x-auto pb-2" scroll-x="true">
+      <view class="flex gap-3">
+        <view
+          wx:for="{{categories}}"
+          wx:key="item"
+          data-item="{{item}}"
+          bindtap="selectCategory"
+          class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium cursor-pointer rounded-btn-custom {{selectedCategory === item ? 'bg-green-500 text-white' : 'bg-white text-gray-600 border border-gray-200'}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 物品列表 -->
+    <view class="">
+      <t-pull-down-refresh
+        value="{{enable}}"
+        bind:refresh="onRefresh"
+        loadingTexts="{{['下拉刷新', '松手刷新', '正在刷新', '刷新完成']}}"
+      >
+        <view
+          wx:for="{{items}}"
+          wx:key="id"
+          bindtap="viewItem"
+          data-item="{{item}}"
+          class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer"
+        >
+          <view class="flex items-center justify-between">
+            <view class="flex items-center flex-1">
+              <view class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mr-4 overflow-hidden">
+                <image
+                  src="{{item.icon}}"
+                  alt="{{item.name}}"
+                  class="w-full h-full object-cover object-top"
+                  mode="aspectFill"
+                />
+              </view>
+              <view class="flex-1">
+                <view class="flex items-center gap-2 mb-1">
+                  <text class="font-medium text-gray-900">{{item.name}}</text>
+                </view>
+                <view class="text-sm text-gray-500 mb-2">{{item.brand}}</view>
+                <view class="flex items-center gap-2">
+                  <view class="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600">
+                    {{item.category}}
+                  </view>
+                </view>
+                <view
+                  wx:if="{{item.location}}"
+                  class="flex items-center mt-2 text-xs text-gray-500"
+                >
+                  <text class="fas fa-map-marker-alt mr-1">📍</text>
+                  {{item.location}}
+                </view>
+              </view>
+            </view>
+            <view class="text-right">
+              <view class="text-lg font-semibold text-gray-900 mb-1">
+                ¥{{item.purchasePriceDisplay}}
+              </view>
+              <view class="text-sm text-gray-500">x{{item.quantity}}</view>
+            </view>
+          </view>
+        </view>
+      </t-pull-down-refresh>
+    </view>
+
+    <!-- <t-tabs defaultValue="recommend">
       <t-tab-panel label="推荐" value="recommend">
         <t-pull-down-refresh
           value="{{enable}}"
@@ -44,17 +125,22 @@
         </t-pull-down-refresh>
       </t-tab-panel>
       <t-tab-panel label="我的关注" value="follow">
-        <view class="home-card-list">
-          <card
-            wx:for="{{focusCardInfo}}"
+          <t-cell
+            wx:for="{{ items }}"
             wx:key="index"
-            desc="{{item.desc}}"
-            url="{{item.url}}"
-            tags="{{item.tags}}"
-          />
-        </view>
+            t-class-image="avatar"
+            t-class-description="content {{ utils.isRead(item.messages) ? '' : 'unread' }}"
+            image="{{ item.avatar }}"
+            title="{{ item.name }}"
+            description="{{ item.messages[item.messages.length - 1].content }}"
+            hover
+            bind:tap="toChat"
+            data-user-id="{{ item.userId }}"
+          >
+            <t-badge slot="right-icon" count="{{ utils.computeUnreadNum(item.messages) }}" class="wrapper" />
+          </t-cell>
       </t-tab-panel>
-    </t-tabs>
+    </t-tabs> -->
 
 
   </view>

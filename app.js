@@ -1,8 +1,9 @@
 // app.js
-import config from './config';
-import Mock from './mock/index';
-import createBus from './utils/eventBus';
-import { connectSocket, fetchUnreadNum } from './mock/chat';
+import config from "./config";
+import Mock from "./mock/index";
+import createBus from "./utils/eventBus";
+import { connectSocket, fetchUnreadNum } from "./mock/chat";
+import { ItemManager } from "~/utils/ItemManager";
 
 if (config.isMock) {
   Mock();
@@ -18,8 +19,8 @@ App({
 
     updateManager.onUpdateReady(() => {
       wx.showModal({
-        title: '更新提示',
-        content: '新版本已经准备好，是否重启应用？',
+        title: "更新提示",
+        content: "新版本已经准备好，是否重启应用？",
         success(res) {
           if (res.confirm) {
             updateManager.applyUpdate();
@@ -35,6 +36,7 @@ App({
     userInfo: null,
     unreadNum: 0, // 未读消息数量
     socket: null, // SocketTask 对象
+    itemManager: new ItemManager(),
   },
 
   /** 全局事件总线 */
@@ -45,7 +47,8 @@ App({
     const socket = connectSocket();
     socket.onMessage((data) => {
       data = JSON.parse(data);
-      if (data.type === 'message' && !data.data.message.read) this.setUnreadNum(this.globalData.unreadNum + 1);
+      if (data.type === "message" && !data.data.message.read)
+        this.setUnreadNum(this.globalData.unreadNum + 1);
     });
     this.globalData.socket = socket;
   },
@@ -54,13 +57,13 @@ App({
   getUnreadNum() {
     fetchUnreadNum().then(({ data }) => {
       this.globalData.unreadNum = data;
-      this.eventBus.emit('unread-num-change', data);
+      this.eventBus.emit("unread-num-change", data);
     });
   },
 
   /** 设置未读消息数量 */
   setUnreadNum(unreadNum) {
     this.globalData.unreadNum = unreadNum;
-    this.eventBus.emit('unread-num-change', unreadNum);
+    this.eventBus.emit("unread-num-change", unreadNum);
   },
 });

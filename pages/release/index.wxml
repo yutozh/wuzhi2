@@ -1,26 +1,127 @@
-<t-navbar title="发布动态" left-arrow />
-<view class="page">
-  <view class="release-container">
-    <view class="upload box">
-      <t-upload t-class="upload-class" media-type="{{['image']}}" files="{{originFiles}}" gridConfig="{{gridConfig}}" bind:success="handleSuccess" bind:remove="handleRemove" max="4" />
-    </view>
+<t-navbar title="添加物品" left-arrow />
+
+<view class="release-container">
+  <view class="info-edit box">
+    <t-cell class="info-edit__cell" title="物品名称">
+      <t-input bind:change="onNameInput" borderless placeholder="请输入物品名称" slot="note" value="{{formData.name}}" />
+    </t-cell>
+    <t-cell class="info-edit__cell" title="品牌">
+      <t-input bind:change="onBrandInput" borderless placeholder="请输入物品名称" slot="note" value="{{formData.brand}}" />
+    </t-cell>
+    <!-- <t-cell class="info-edit__cell" title="性别">
+      <t-radio-group
+        bind:change="onGenderChange"
+        borderless
+        defaultValue="{{personInfo.gender}}"
+        options="{{genderOptions}}"
+        slot="note"
+        t-class="info-edit__gender"
+        value="{{personInfo.gender}}"
+      />
+    </t-cell> -->
+
+    <!-- 物品类型 -->
+    <t-cell arrow bind:click="showPicker" data-mode="category" note="{{formData.category || '请选择物品类型'}}" title="物品类型" />
+
+    <!-- 购入日期 -->
+    <t-cell arrow bind:click="showPicker" data-mode="purchaseDate" note="{{formData.purchaseDate || '请选择购入日期'}}" title="购入日期" />
+
+    <!-- 价格 -->
+    <t-cell class="info-edit__cell" title="价格">
+      <t-input bind:change="onPurchasePriceInput" borderless placeholder="0.00" tips="{{priceError ? '请输入正确的价格' : ''}}"
+         slot="note" suffix="元" align="right" type="number" format="{{priceFormat}}" t-class-tips="tips" value="{{formData.purchasePrice}}"
+      />
+    </t-cell>
+
+    <!-- 数量 -->
+    <t-cell class="info-edit__cell" title="数量">
+      <t-input bind:change="onQuantityInput" borderless placeholder="填写数量" tips="{{quantityError ? '请输入正确的数量' : ''}}"
+         slot="note"  align="right" type="number" t-class-tips="tips" value="{{formData.quantity}}"
+      />
+    </t-cell>
+
+    <!-- 成本计算方式 -->
+    <t-cell class="info-edit__cell" title="成本计算法">
+      <t-radio-group
+        bind:change="onCalculationMethodChange"
+        borderless
+        defaultValue="{{formData.averagePriceCalculationMethod}}"
+        options="{{calculationMethods}}"
+        slot="note"
+        t-class="info-edit__gender"
+        value="{{formData.averagePriceCalculationMethod}}"
+      />
+    </t-cell>
+
     <view class="desc box">
-      <view class="desc-label">添加描述</view>
-      <t-textarea t-class="desc-class" t-class-textarea="placeholder-class" placeholder="分享你此刻的想法" maxlength="500" disableDefaultPadding="{{true}}" indicator />
+      <view class="desc-label">描述</view>
+      <!-- <t-textarea  slot="note" t-class="desc-class" t-class-textarea="placeholder-class" placeholder="分享你此刻的想法" maxlength="500" disableDefaultPadding="{{true}}" indicator /> -->
+        <t-textarea
+          value="{{formData.remarks}}"
+          t-class="desc-class"
+          t-class-textarea="placeholder-class"
+          placeholder="请输入描述（可选）"
+          disableDefaultPadding="{{true}}"
+          bindinput="onRemarksInput"
+          slot="note"
+        />
     </view>
-    <view class="taggroup box">
-      <t-cell t-class-title="cell-title-class" t-class-note="cell-note-class" title="添加标签">
-        <block wx:for="{{tags}}" wx:key="index">
-          <t-check-tag t-class="tag-class" size="medium" default-checked="{{index===0}}" variant="dark" content="#{{item}}" slot="note" />
-        </block>
-      </t-cell>
-    </view>
-    <view class="location box">
-      <t-cell title="所在位置" hover arrow leftIcon="location" bindtap="gotoMap" />
-    </view>
-    <view class="btngroup box">
-      <t-button t-class="btn-class" theme="light" icon="file-copy" content="存草稿" size="large" bindtap="saveDraft"></t-button>
-      <t-button t-class="btn-class" theme="primary" icon="upload" content="发布" size="large" bindtap="release"></t-button>
-    </view>
+
+  </view>
+
+
+  <!-- <view class="upload box">
+    <t-upload t-class="upload-class" media-type="{{['image']}}" files="{{originFiles}}" gridConfig="{{gridConfig}}" bind:success="handleSuccess" bind:remove="handleRemove" max="4" />
+  </view>
+  <view class="desc box">
+    <view class="desc-label">添加描述</view>
+    <t-textarea t-class="desc-class" t-class-textarea="placeholder-class" placeholder="分享你此刻的想法" maxlength="500" disableDefaultPadding="{{true}}" indicator />
+  </view>
+  <view class="taggroup box">
+    <t-cell t-class-title="cell-title-class" t-class-note="cell-note-class" title="添加标签">
+      <block wx:for="{{tags}}" wx:key="index">
+        <t-check-tag t-class="tag-class" size="medium" default-checked="{{index===0}}" variant="dark" content="#{{item}}" slot="note" />
+      </block>
+    </t-cell>
+  </view>
+  <view class="location box">
+    <t-cell title="所在位置" hover arrow leftIcon="location" bindtap="gotoMap" />
+  </view> -->
+  <view class="btngroup box">
+    <!-- <t-button t-class="btn-class" theme="light" icon="file-copy" content="存草稿" size="large" bindtap="saveDraft"></t-button> -->
+    <t-button t-class="btn-class" theme="primary" icon="upload" content="发布" size="large" bindtap="saveItem"></t-button>
   </view>
 </view>
+
+<t-picker
+  bind:cancel="hidePicker"
+  bind:change="onPickerChange"
+  bind:close="hidePicker"
+  bind:pick="onAreaPick"
+  cancelBtn="取消"
+  confirmBtn="确认"
+  data-mode="category"
+  mode="category"
+  title="选择物品类别"
+  value="{{formData.category}}"
+  visible="{{categoryVisible}}"
+>
+  <t-picker-item options="{{categories}}" />
+</t-picker>
+
+<t-date-time-picker
+  auto-close
+  bind:cancel="hidePicker"
+  bind:change="onPickerChange"
+  cancelBtn="取消"
+  confirmBtn="确认"
+  data-mode="purchaseDate"
+  defaultValue="{{today}}"
+  format="YYYY-MM-DD"
+  mode="date"
+  popup-props="{{ { usingCustomNavbar: true } }}"
+  end="{{today}}"
+  title="选择购入日期"
+  value="{{personInfo.purchaseDate}}"
+  visible="{{purchaseDateVisible}}"
+/>
