@@ -1,0 +1,24 @@
+{
+    "version": "1.0",
+    "seriesId": "green",
+    "seriesName": "绿色环保系列",
+    "icons": [
+        {
+            "id": "fridge",
+            "name": "环保冰箱",
+            "filename": "fridge.svg",
+            "keywords": [
+                "冰箱",
+                "家电",
+                "制冷",
+                "厨房",
+                "保鲜",
+                "环保",
+                "绿色",
+                "fridge",
+                "refrigerator",
+                "eco"
+            ]
+        }
+    ]
+}

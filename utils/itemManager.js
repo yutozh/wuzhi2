@@ -10,6 +10,7 @@ export class ValidationError extends Error {
   constructor(message) {
     super(message);
     this.name = "ValidationError";
+    this.isValidationError = true; // 添加明确的标识
   }
 }
 

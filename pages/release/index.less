@@ -10,6 +10,30 @@
   .box {
     width: 100%;
   }
+
+  // 关联物品提示样式
+  .associated-item-tip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16rpx;
+    padding: 24rpx 32rpx;
+    margin: 16rpx 32rpx;
+    background-color: #f0f9ff;
+    border: 2rpx solid #0ea5e9;
+    border-radius: 16rpx;
+
+    .tip-icon {
+      font-size: 32rpx;
+    }
+
+    .tip-text {
+      font-size: 28rpx;
+      color: #0369a1;
+      font-weight: 500;
+    }
+  }
+
   .upload {
     height: 112rpx * 2;
     position: relative;
@@ -47,15 +71,31 @@
     }
   }
   .btngroup {
+    z-index: 9;
     display: flex;
     justify-content: space-evenly;
     padding: 32rpx;
     position: fixed;
-    bottom: 64rpx;
+    bottom: 0rpx;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    // border-top: 2rpx solid #f0f0f0;
+    // 添加安全区域适配
+    padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+
     .btn-class {
       width: 163.5rpx * 2;
       margin: 0;
     }
+  }
+
+  // 表单底部间距，防止被固定按钮遮挡
+  .form-bottom-spacer {
+    height: calc(
+      200rpx + env(safe-area-inset-bottom)
+    ); // 按钮高度 + padding + 安全区域 + 额外间距
+    width: 100%;
   }
 }
 
@@ -125,4 +165,165 @@ page {
 .verify {
   color: var(--td-brand-color, #0052d9);
   font-size: 32rpx;
+}
+
+/* 图标选择相关样式 */
+.icon-selector {
+  .icon-display {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .selected-icon {
+      width: 48rpx;
+      height: 48rpx;
+      margin-right: 16rpx;
+    }
+
+    .icon-placeholder {
+      color: #999;
+      margin-right: 16rpx;
+    }
+
+    .arrow-icon {
+      transition: transform 0.3s ease;
+
+      &.arrow-up {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+.icon-candidates {
+  background: #f8f8f8;
+  padding: 24rpx 32rpx;
+
+  .icon-scroll {
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  .icon-list {
+    display: inline-flex;
+    align-items: center;
+
+    .icon-item {
+      width: 80rpx;
+      height: 80rpx;
+      margin-right: 24rpx;
+      border: 2rpx solid transparent;
+      border-radius: 12rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+
+      &.selected {
+        border-color: var(--td-brand-color, #0052d9);
+      }
+
+      .icon-image {
+        width: 60rpx;
+        height: 60rpx;
+      }
+    }
+
+    .more-icon-btn {
+      width: 80rpx;
+      height: 80rpx;
+      border: 2rpx solid #ddd;
+      border-radius: 12rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      color: #666;
+      font-size: 24rpx;
+    }
+  }
+}
+
+/* 弹窗样式 */
+.icon-popup {
+  height: 70vh; /* 固定弹窗高度 */
+  display: flex;
+  flex-direction: column;
+
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32rpx;
+    border-bottom: 1rpx solid #f0f0f0;
+    background: #fff;
+    flex-shrink: 0; /* 防止header被压缩 */
+
+    .popup-title {
+      font-size: 36rpx;
+      font-weight: 500;
+    }
+  }
+
+  .icon-tabs {
+    background: #fff;
+    flex: 1; /* 占据剩余空间 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .tab-content-scroll {
+      height: 100%;
+
+      .all-icons-grid {
+        padding: 32rpx;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24rpx;
+        min-height: 100%; /* 确保网格至少占满容器 */
+
+        .all-icon-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 24rpx 16rpx;
+          border: 2rpx solid transparent;
+          border-radius: 12rpx;
+          background: #f8f8f8;
+
+          &.selected {
+            border-color: var(--td-brand-color, #0052d9);
+            background: #e6f3ff;
+          }
+
+          .all-icon-image {
+            width: 60rpx;
+            height: 60rpx;
+            margin-bottom: 12rpx;
+          }
+
+          .icon-name {
+            font-size: 24rpx;
+            color: #666;
+            text-align: center;
+            word-break: break-all;
+            line-height: 1.2;
+          }
+        }
+      }
+    }
+  }
+}
+// 响应式适配
+@media (max-width: 750rpx) {
+  .release-container {
+    .form-bottom-spacer {
+      height: calc(180rpx + env(safe-area-inset-bottom)); // 小屏幕适配
+    }
+
+    .btngroup {
+      padding: 24rpx;
+      padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+    }
+  }
 }

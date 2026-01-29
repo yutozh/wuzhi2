@@ -10,6 +10,12 @@ export enum EntityType {
   SERVICE = "SERVICE",
 }
 
+export enum StatusType {
+  NORMAL = "NORMAL",
+  LOST = "LOST",
+  DAMAGED = "DAMAGED",
+  RETIRED = "RETIRED",
+}
 // // 基础物品数据接口
 // export interface BaseItemData {
 //   name: string;

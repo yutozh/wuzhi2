@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "seriesId": "default",
+  "seriesName": "默认图标集",
+  "icons": [
+    {
+      "id": "fridge",
+      "name": "冰箱",
+      "filename": "fridge.svg",
+      "keywords": [
+        "冰箱",
+        "家电",
+        "制冷",
+        "厨房",
+        "保鲜",
+        "fridge",
+        "refrigerator"
+      ]
+    },
+    {
+      "id": "washing_machine",
+      "name": "洗衣机",
+      "filename": "washing-machine.svg",
+      "keywords": [
+        "洗衣机",
+        "家电",
+        "清洗",
+        "衣物",
+        "washing",
+        "washer"
+      ]
+    },
+    {
+      "id": "dianfanguo",
+      "name": "电饭锅",
+      "filename": "dianfanguo.svg",
+      "keywords": [
+        "电饭锅",
+        "厨房",
+        "家电",
+        "煮饭",
+        "米饭",
+        "rice",
+        "cooker"
+      ]
+    },
+    {
+      "id": "dianfanguo_1",
+      "name": "电饭煲",
+      "filename": "dianfanguo_1.svg",
+      "keywords": [
+        "电饭煲",
+        "厨房",
+        "家电",
+        "煮饭",
+        "米饭",
+        "rice",
+        "cooker"
+      ]
+    },
+    {
+      "id": "shumachanpin",
+      "name": "数码产品",
+      "filename": "shumachanpin.svg",
+      "keywords": [
+        "数码",
+        "电子",
+        "产品",
+        "科技",
+        "digital",
+        "electronic"
+      ]
+    },
+    {
+      "id": "shumachanpin_1",
+      "name": "手机",
+      "filename": "shumachanpin_1.svg",
+      "keywords": [
+        "手机",
+        "数码",
+        "电子",
+        "通讯",
+        "phone",
+        "mobile"
+      ]
+    },
+    {
+      "id": "shumachanpin_2",
+      "name": "平板",
+      "filename": "shumachanpin_2.svg",
+      "keywords": [
+        "平板",
+        "数码",
+        "电子",
+        "tablet",
+        "ipad"
+      ]
+    },
+    {
+      "id": "shumachanpinpingce",
+      "name": "电脑",
+      "filename": "shumachanpinpingce.svg",
+      "keywords": [
+        "电脑",
+        "数码",
+        "电子",
+        "计算机",
+        "computer",
+        "laptop"
+      ]
+    },
+    {
+      "id": "a-3Cshumachanpinjiebaoan",
+      "name": "3C数码",
+      "filename": "a-3Cshumachanpinjiebaoan.svg",
+      "keywords": [
+        "3C",
+        "数码",
+        "电子",
+        "产品",
+        "科技",
+        "digital"
+      ]
+    }
+  ]
+}

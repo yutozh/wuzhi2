@@ -2,44 +2,57 @@
 <view class="home-container">
   <view class="home-content">
     <!-- 统计卡片 -->
-    <view class="bg-white rounded-2xl p-6 mb-4 shadow-sm">
-      <view class="grid grid-cols-2 gap-6">
-        <view>
-          <view class="text-3xl font-bold text-gray-900 mb-1">
-            {{totalCount}}
-          </view>
-          <view class="text-gray-500 text-sm">总物品数量</view>
+    <view class="statistics-card">
+      <view class="statistics-grid">
+        <view class="statistics-item">
+          <view class="statistics-value">{{totalCount}}</view>
+          <view class="statistics-label">总物品数量</view>
         </view>
-        <view>
-          <view class="text-3xl font-bold text-green-500 mb-1">
-            ¥{{totalValue}}
-          </view>
-          <view class="text-gray-500 text-sm">总价值</view>
+        <view class="statistics-item">
+          <view class="statistics-value statistics-value-price">¥{{totalValue}}</view>
+          <view class="statistics-label">总价值</view>
         </view>
       </view>
     </view>
 
-    <!-- 搜索框 -->
-    <view class="relative mb-4 w-full">
-      <input
-        value="{{searchQuery}}"
-        type="text"
-        placeholder="搜索物品..."
-        class=" bg-white rounded-2xl px-4 py-3 pl-12 text-gray-900 border-none shadow-sm"
-        bindinput="onSearchInput"
-      />
-      <text class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</text>
+    <!-- 搜索框和视图模式切换 -->
+    <view class="search-container">
+      <view class="search-input-wrapper">
+        <input
+          value="{{searchQuery}}"
+          type="text"
+          placeholder="搜索物品..."
+          class="search-input"
+          bindinput="onSearchInput"
+        />
+        <text class="search-icon">🔍</text>
+        <!-- 清除按钮（仅在有搜索内容时显示） -->
+        <view 
+          wx:if="{{searchQuery}}"
+          class="search-clear-button"
+          bindtap="clearSearch"
+        >
+          <text class="search-clear-icon">✕</text>
+        </view>
+      </view>
+      <!-- 视图模式切换按钮 -->
+      <view 
+        class="view-mode-toggle"
+        bindtap="toggleViewMode"
+      >
+        <text class="view-mode-icon">{{viewMode === 'list' ? '☰' : '⊞'}}</text>
+      </view>
     </view>
 
     <!-- 分类筛选 -->
-    <scroll-view class="flex gap-3 mb-6 overflow-x-auto pb-2" scroll-x="true">
-      <view class="flex gap-3">
+    <scroll-view class="category-filter-scroll" scroll-x="true" enable-flex="true">
+      <view class="category-filter-container">
         <view
           wx:for="{{categories}}"
           wx:key="item"
           data-item="{{item}}"
           bindtap="selectCategory"
-          class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium cursor-pointer rounded-btn-custom {{selectedCategory === item ? 'bg-green-500 text-white' : 'bg-white text-gray-600 border border-gray-200'}}"
+          class="category-filter-item {{selectedCategory === item ? 'category-filter-item-selected' : 'category-filter-item-unselected'}}"
         >
           {{item}}
         </view>
@@ -47,54 +60,146 @@
     </scroll-view>
 
     <!-- 物品列表 -->
-    <view class="">
+    <view class="item-list-container">
       <t-pull-down-refresh
         value="{{enable}}"
         bind:refresh="onRefresh"
         loadingTexts="{{['下拉刷新', '松手刷新', '正在刷新', '刷新完成']}}"
       >
-        <view
-          wx:for="{{items}}"
-          wx:key="id"
-          bindtap="viewItem"
-          data-item="{{item}}"
-          class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer"
-        >
-          <view class="flex items-center justify-between">
-            <view class="flex items-center flex-1">
-              <view class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mr-4 overflow-hidden">
-                <image
-                  src="{{item.icon}}"
-                  alt="{{item.name}}"
-                  class="w-full h-full object-cover object-top"
-                  mode="aspectFill"
-                />
-              </view>
-              <view class="flex-1">
-                <view class="flex items-center gap-2 mb-1">
-                  <text class="font-medium text-gray-900">{{item.name}}</text>
+        <!-- 空状态组件 -->
+        <view wx:if="{{items.length === 0}}" class="empty-state">
+          <view class="empty-icon">📦</view>
+          <view class="empty-text">
+            {{searchQuery ? '未找到匹配的物品' : '暂无物品'}}
+          </view>
+          <view class="empty-hint">
+            {{searchQuery ? '试试其他关键词或清除搜索' : '点击右下角按钮添加物品'}}
+          </view>
+        </view>
+
+        <!-- 列表模式 -->
+        <view wx:elif="{{viewMode === 'list'}}" class="list-mode">
+          <view
+            wx:for="{{items}}"
+            wx:key="id"
+            bindtap="viewItem"
+            data-item="{{item}}"
+            class="list-item"
+          >
+            <view class="list-item-content">
+              <!-- 左侧：图片 + 信息 -->
+              <view class="list-item-left">
+                <view class="list-item-image">
+                  <image
+                    src="{{item.iconPath}}"
+                    alt="{{item.name}}"
+                    class="item-image"
+                    mode="aspectFill"
+                    lazy-load="{{true}}"
+                    binderror="onImageError"
+                    data-id="{{item.id}}"
+                  />
                 </view>
-                <view class="text-sm text-gray-500 mb-2">{{item.brand}}</view>
-                <view class="flex items-center gap-2">
-                  <view class="px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600">
+                <view class="list-item-info">
+                  <!-- 物品名称（主要信息） -->
+                  <view class="item-name">{{item.name}}</view>
+                  
+                  <!-- 品牌（次要信息） -->
+                  <view class="item-brand">{{item.brand}}</view>
+                  
+                  <!-- 分类标签 -->
+                  <view class="item-category-tag">
                     {{item.category}}
                   </view>
-                </view>
-                <view
-                  wx:if="{{item.location}}"
-                  class="flex items-center mt-2 text-xs text-gray-500"
-                >
-                  <text class="fas fa-map-marker-alt mr-1">📍</text>
-                  {{item.location}}
+                  
+                  <!-- 位置信息（条件渲染） -->
+                  <view wx:if="{{item.location}}" class="item-location">
+                    <text class="location-icon">📍</text>
+                    <text>{{item.location}}</text>
+                  </view>
+                  
+                  <!-- 关联物品提示（条件渲染） -->
+                  <view wx:if="{{item.associatedItems && item.associatedItems.length > 0}}" class="item-associated">
+                    <text class="associated-icon">🔗</text>
+                    <text>关联 {{item.associatedItems.length}} 个物品</text>
+                  </view>
                 </view>
               </view>
-            </view>
-            <view class="text-right">
-              <view class="text-lg font-semibold text-gray-900 mb-1">
-                ¥{{item.purchasePriceDisplay}}
+              
+              <!-- 右侧：价格 + 数量 -->
+              <view class="list-item-right">
+                <view class="item-price">¥{{item.purchasePriceDisplay}}</view>
+                <view class="item-quantity">x{{item.quantity}}</view>
               </view>
-              <view class="text-sm text-gray-500">x{{item.quantity}}</view>
             </view>
+          </view>
+          
+          <!-- 加载更多指示器 -->
+          <view wx:if="{{hasMoreData}}" class="load-more-container" bindtap="loadMore">
+            <view wx:if="{{isLoadingMore}}" class="loading-indicator">
+              <text class="loading-text">加载中...</text>
+            </view>
+            <view wx:else class="load-more-button">
+              <text class="load-more-text">点击加载更多</text>
+            </view>
+          </view>
+          
+          <!-- 没有更多数据提示 -->
+          <view wx:if="{{!hasMoreData && items.length > 0}}" class="no-more-data">
+            <text class="no-more-text">已加载全部数据</text>
+          </view>
+        </view>
+
+        <!-- 卡片模式 -->
+        <view wx:else class="card-mode">
+          <view
+            wx:for="{{items}}"
+            wx:key="id"
+            bindtap="viewItem"
+            data-item="{{item}}"
+            class="card-item"
+          >
+            <!-- 图片在上 -->
+            <view class="card-item-image">
+              <image
+                src="{{item.iconPath}}"
+                alt="{{item.name}}"
+                class="card-image"
+                mode="aspectFill"
+                lazy-load="{{true}}"
+                binderror="onImageError"
+                data-id="{{item.id}}"
+              />
+            </view>
+            
+            <!-- 信息在下 -->
+            <view class="card-item-info">
+              <!-- 物品名称 -->
+              <view class="card-item-name">{{item.name}}</view>
+              
+              <!-- 价格 -->
+              <view class="card-item-price">¥{{item.purchasePriceDisplay}}</view>
+              
+              <!-- 分类标签 -->
+              <view class="card-item-category-tag">
+                {{item.category}}
+              </view>
+            </view>
+          </view>
+          
+          <!-- 加载更多指示器 -->
+          <view wx:if="{{hasMoreData}}" class="load-more-container" bindtap="loadMore">
+            <view wx:if="{{isLoadingMore}}" class="loading-indicator">
+              <text class="loading-text">加载中...</text>
+            </view>
+            <view wx:else class="load-more-button">
+              <text class="load-more-text">点击加载更多</text>
+            </view>
+          </view>
+          
+          <!-- 没有更多数据提示 -->
+          <view wx:if="{{!hasMoreData && items.length > 0}}" class="no-more-data">
+            <text class="no-more-text">已加载全部数据</text>
           </view>
         </view>
       </t-pull-down-refresh>
@@ -153,3 +258,177 @@
 </view>
 
 <t-message id="t-message" />
+
+<!-- 物品详情弹窗 -->
+<view wx:if="{{showDetailModal}}" class="detail-modal-overlay" bindtap="closeDetailModal">
+  <view class="detail-modal-container" catchtap="stopPropagation">
+    <!-- 弹窗头部 -->
+    <view class="detail-modal-header">
+      <view class="detail-modal-title">物品详情</view>
+      <view class="detail-modal-close" bindtap="closeDetailModal">
+        <text class="close-icon">✕</text>
+      </view>
+    </view>
+
+    <!-- 弹窗内容 -->
+    <scroll-view class="detail-modal-content" scroll-y="true" bindtap="endEditUseTimes">
+      <view wx:if="{{currentItemDetail}}" class="detail-content">
+        
+        <!-- 基本信息区域 -->
+        <view class="detail-section">
+          <view class="detail-section-title">基本信息</view>
+          
+          <!-- 物品图标和名称 -->
+          <view class="detail-item detail-item-main">
+            <view class="detail-item-icon">
+              <image src="{{currentItemDetail.iconPath}}" class="detail-icon-image" mode="aspectFill" />
+            </view>
+            <view class="detail-item-info">
+              <view class="detail-item-name">{{currentItemDetail.name}}</view>
+              <view class="detail-item-brand">{{currentItemDetail.brand || '无品牌'}}</view>
+            </view>
+          </view>
+
+          <!-- 分类和实体类型 -->
+          <view class="detail-row">
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">分类</view>
+              <view class="detail-value">{{currentItemDetail.category}}</view>
+            </view>
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">类型</view>
+              <view class="detail-value">{{currentItemDetail.entityTypeLabel}}</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 价格信息区域 -->
+        <view class="detail-section">
+          <view class="detail-section-title">价格信息</view>
+          
+          <view class="detail-row">
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">购入价格</view>
+              <view class="detail-value detail-value-price">¥{{currentItemDetail.purchasePriceDisplay}}</view>
+            </view>
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">数量</view>
+              <view class="detail-value">{{currentItemDetail.quantity}}</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 日期信息区域 -->
+        <view class="detail-section">
+          <view class="detail-section-title">日期信息</view>
+          
+          <view class="detail-item">
+            <view class="detail-label">购入日期</view>
+            <view class="detail-value">{{currentItemDetail.purchaseDateFormatted}}</view>
+          </view>
+
+          <!-- 退役日期（条件显示） -->
+          <view wx:if="{{currentItemDetail.showRetireDate}}" class="detail-item">
+            <view class="detail-label">退役日期</view>
+            <view class="detail-value">{{currentItemDetail.retireDateFormatted || '未设置'}}</view>
+          </view>
+        </view>
+
+        <!-- 状态信息区域 -->
+        <view class="detail-section">
+          <view class="detail-section-title">状态信息</view>
+          
+          <view class="detail-row">
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">物品状态</view>
+              <view class="detail-value">{{currentItemDetail.statusLabel}}</view>
+            </view>
+            <view class="detail-item detail-item-half">
+              <view class="detail-label">成本计算</view>
+              <view class="detail-value">{{currentItemDetail.calculationMethodLabel}}</view>
+            </view>
+          </view>
+
+          <!-- 已使用次数（条件显示且可编辑） -->
+          <view wx:if="{{currentItemDetail.showUseTimes}}" class="detail-item">
+            <view class="detail-label">已使用次数</view>
+            <view class="detail-value detail-value-editable">
+              <!-- 默认显示文字，点击后显示步进器 -->
+              <view wx:if="{{!useTimesEditing}}" class="use-times-display-clickable" catchtap="startEditUseTimes">
+                {{currentItemDetail.useTimes || 1}} 次
+              </view>
+              <!-- 编辑状态显示步进器 -->
+              <view wx:else class="use-times-stepper-container" catchtap="stopPropagation">
+                <t-stepper 
+                  value="{{currentItemDetail.useTimes || 1}}" 
+                  min="0" 
+                  max="9999" 
+                  theme="filled"
+                  bind:change="onUseTimesChange"
+                />
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 备注信息区域 -->
+        <view wx:if="{{currentItemDetail.remarks}}" class="detail-section">
+          <view class="detail-section-title">备注信息</view>
+          <view class="detail-item">
+            <view class="detail-value detail-value-remarks">{{currentItemDetail.remarks}}</view>
+          </view>
+        </view>
+
+        <!-- 关联物品区域 -->
+        <view class="detail-section">
+          <view class="detail-section-title">
+            关联物品
+            <text wx:if="{{currentItemDetail.associatedItemsCount > 0}}" class="associated-total-value">
+              ({{currentItemDetail.associatedItemsCount}}个) 总价值: ¥{{currentItemDetail.totalAssociatedValue}}
+            </text>
+          </view>
+          
+          <!-- 有关联物品时显示列表 -->
+          <view wx:if="{{currentItemDetail.associatedItemsCount > 0}}" class="associated-items-list">
+            <view wx:for="{{currentItemDetail.associatedItems}}" wx:key="id" class="associated-item" bindtap="editAssociatedItem" data-associated-item="{{item}}">
+              <view class="associated-item-info">
+                <view class="associated-item-name">{{item.name}}</view>
+                <view class="associated-item-brand">{{item.brand || '无品牌'}}</view>
+              </view>
+              <view class="associated-item-right">
+                <view class="associated-item-price">¥{{item.purchasePriceDisplay}}</view>
+                <view class="associated-item-arrow">›</view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 没有关联物品时显示提示 -->
+          <view wx:else class="no-associated-items">
+            <view class="no-associated-text">暂无关联物品</view>
+          </view>
+          
+          <!-- 新增关联物品按钮 -->
+          <view class="add-associated-button-container">
+            <t-button 
+              theme="light" 
+              size="medium" 
+              icon="add" 
+              bindtap="addAssociatedItem"
+              t-class="add-associated-button"
+            >
+              新增关联物品
+            </t-button>
+          </view>
+        </view>
+
+      </view>
+    </scroll-view>
+
+    <!-- 弹窗底部操作按钮 -->
+    <view class="detail-modal-footer">
+      <t-button theme="primary" size="large" bindtap="editItemFromDetail">
+        编辑
+      </t-button>
+    </view>
+  </view>
+</view>

@@ -2,9 +2,10 @@
 import {
   AveragePriceCalculationMethod,
   EntityType,
+  StatusType,
 } from "~/static/types/ItemTypes";
 import { formatToTwoDecimal, toCents, toPrice } from "~/utils/util";
-import { ValidationError } from "~/utils/ItemManager";
+import { ValidationError } from "~/utils/itemManager";
 
 const app = getApp();
 
@@ -57,8 +58,11 @@ Page({
       },
     ],
     //
+    title: "添加物品",
+    btnOptionContent: "发布",
     itemManager: null,
-    pageType: "add",
+    pageType: "add", // add 新增， edit 编辑
+    isAssociated: false, // 是否关联物品，根据是否有parentID确定
     formData: {
       name: "",
       brand: "",
@@ -68,11 +72,16 @@ Page({
       quantity: 1,
       purchasePrice: "",
       purchaseDate: "",
+      status: StatusType.NORMAL,
+      lifePeriod: "",
       retireDate: "",
       averagePriceCalculationMethod: AveragePriceCalculationMethod.BY_DAY,
+      useTimes: 1,
       entityType: EntityType.PHYSICAL,
       remarks: "",
     },
+    selectedStatusLabel: "使用中",
+    associatedItems: [],
     categories: [
       { label: "电子产品", value: "电子产品" },
       { label: "服装", value: "服装" },
@@ -86,6 +95,12 @@ Page({
       { label: "虚拟产品", value: EntityType.VIRTUAL },
       { label: "服务", value: EntityType.SERVICE },
     ],
+    statusTypes: [
+      { label: "使用中", value: StatusType.NORMAL },
+      { label: "退役/报废", value: StatusType.RETIRED },
+      { label: "遗失", value: StatusType.LOST },
+      { label: "损坏", value: StatusType.DAMAGED },
+    ],
     calculationMethods: [
       { label: "按日", value: AveragePriceCalculationMethod.BY_DAY },
       {
@@ -94,8 +109,10 @@ Page({
       },
     ],
     categoryVisible: false,
+    statusVisible: false,
     today: "",
     purchaseDateVisible: false,
+    retireDateVisible: false,
     priceError: false,
     priceFormat: (v) => {
       const isNumber = /^\d+(\.\d+)?$/.test(v);
@@ -105,13 +122,24 @@ Page({
       return v;
     },
     quantityError: false,
+    // 图标选择相关
+    iconSelectorVisible: false,
+    candidateIcons: [],
+    allIcons: [],
+    allIconsDrawerVisible: false,
+    selectedIconInDrawer: "",
+    // 系列化图标数据
+    iconSeries: [], // 存储所有系列信息
+    iconsBySeriesId: {}, // 按系列ID分组的图标数据
+    currentTabIndex: 0, // 当前选中的tab索引
+    selectedIconInfo: null, // 当前选中图标的详细信息
   },
 
   onLoad(options) {
     this.itemManager = app.globalData.itemManager;
     const { pageType, itemId, parentId } = options;
     const categories = this.itemManager.getCategories();
-    console.log("categories", categories);
+    console.log("options", options);
     this.setData({
       categories: categories.map((item) => {
         return { label: item, value: item };
@@ -121,17 +149,90 @@ Page({
       parentId: parentId || "",
     });
 
-    // 设置今天的日期
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-
     this.setData({
-      today: `${year}-${month}-${day}`,
+      today: this.getCurrentDate(),
+      isAssociated: this.data.parentId,
     });
+    // 加载图标数据
+    this.loadIconData();
 
-    console.log(this.data.today);
+    // 根据页面类型设置标题和加载数据
+    if (pageType === "edit") {
+      let title = this.data.parentId ? "编辑关联物品" : "编辑物品";
+      this.loadItemData();
+      this.setData({
+        title: title,
+        btnOptionContent: "更新",
+      });
+    } else if (pageType === "add") {
+      let title = this.data.parentId ? "添加关联物品" : "添加物品";
+      this.setData({
+        title: title,
+        btnOptionContent: "提交",
+        "formData.purchaseDate": this.getCurrentDate(),
+      });
+
+      // 如果是新增关联物品，设置默认值
+      if (this.data.parentId) {
+        this.setData({
+          "formData.category": "其他", // 设置默认类型
+          "formData.icon": "default_1", // 设置默认图标
+          "formData.entityType": EntityType.PHYSICAL, // 设置默认实体类型
+          "formData.averagePriceCalculationMethod":
+            AveragePriceCalculationMethod.BY_DAY, // 设置默认成本计算方式
+          "formData.useTimes": 1, // 设置默认使用次数
+        });
+      }
+    }
+  },
+
+  // 加载物品数据
+  loadItemData() {
+    if (!this.itemManager || !this.data.itemId) return;
+
+    let item;
+
+    if (this.data.pageType === "edit" && this.data.isAssociated) {
+      // 加载关联物品数据
+      const parentItem = this.itemManager.getItem(this.data.parentId);
+      if (parentItem) {
+        item = parentItem.associatedItems.find(
+          (assoc) => assoc.id === this.data.itemId
+        );
+      }
+      this.setData({ title: "编辑关联物品" });
+    } else {
+      // 加载主物品数据
+      item = this.itemManager.getItem(this.data.itemId);
+      this.setData({
+        title: "编辑物品",
+        associatedItems: item.associatedItems || [],
+      });
+    }
+
+    if (item) {
+      this.setData({
+        formData: {
+          name: item.name,
+          brand: item.brand,
+          category: item.category,
+          icon: item.icon,
+          quantity: item.quantity,
+          images: [...item.images],
+          purchasePrice: toPrice(item.purchasePrice),
+          purchaseDate: item.purchaseDate.split("T")[0],
+          lifePeriod: item.lifePeriod,
+          status: item.status,
+          retireDate: item.retireDate ? item.retireDate.split("T")[0] : "",
+          averagePriceCalculationMethod: item.averagePriceCalculationMethod,
+          useTimes: item.useTimes || 1,
+          entityType: item.entityType,
+          remarks: item.remarks || "",
+        },
+      });
+      // 显示选中的图标
+      this.selectIconByID(item.icon);
+    }
   },
   handleSuccess(e) {
     const { files } = e.detail;
@@ -170,11 +271,22 @@ Page({
     });
   },
 
+  // 获取当前日期
+  getCurrentDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  },
+
   // 表单输入处理
   onNameInput(e) {
     this.setData({
       "formData.name": e.detail.value,
     });
+    // 当物品名称改变时，更新候选图标
+    this.updateCandidateIcons(e.detail.value);
   },
 
   onBrandInput(e) {
@@ -183,13 +295,13 @@ Page({
     });
   },
 
-  onCategoryChange(e) {
-    const selectedIndex = parseInt(e.detail.value);
-    this.setData({
-      "formData.category": this.data.categories[selectedIndex],
-      selectedCategoryIndex: selectedIndex,
-    });
-  },
+  // onCategoryChange(e) {
+  //   const selectedIndex = parseInt(e.detail.value);
+  //   this.setData({
+  //     "formData.category": this.data.categories[selectedIndex],
+  //     selectedCategoryIndex: selectedIndex,
+  //   });
+  // },
 
   onIconInput(e) {
     this.setData({
@@ -235,6 +347,12 @@ Page({
     });
   },
 
+  // onStatusChange(e) {
+  //   this.setData({
+  //     "formData.status": e.detail.value,
+  //   });
+  // },
+
   onCalculationMethodChange(e) {
     this.setData({
       "formData.averagePriceCalculationMethod": e.detail.value,
@@ -242,12 +360,8 @@ Page({
   },
 
   onEntityTypeChange(e) {
-    const selectedIndex = parseInt(e.detail.value);
-    const selectedType = this.data.entityTypes[selectedIndex];
     this.setData({
-      "formData.entityType": selectedType.value,
-      selectedEntityTypeIndex: selectedIndex,
-      selectedEntityTypeLabel: selectedType.label,
+      "formData.entityType": e.detail.value,
     });
   },
 
@@ -277,6 +391,12 @@ Page({
     }
   },
 
+  onUseTimesChange(e) {
+    this.setData({
+      "formData.useTimes": e.detail.value,
+    });
+  },
+
   // 选择框
   showPicker(e) {
     const { mode } = e.currentTarget.dataset;
@@ -291,7 +411,15 @@ Page({
     });
   },
   onAreaPick(e) {
-    console.log("picker pick:", e);
+    const { mode } = e.currentTarget.dataset;
+    if (mode === "status") {
+      // 更新展示文字
+      this.setData({
+        "formData.status": e.detail.value,
+        selectedStatusLabel: e.detail.label[0],
+      });
+    }
+    console.log("pick", e.detail.value);
   },
   onPickerChange(e) {
     const { value, label } = e.detail;
@@ -312,13 +440,11 @@ Page({
       return false;
     }
 
-    if (!category) {
+    if (!category && !this.data.isAssociated) {
       wx.showToast({ title: "请选择分类", icon: "none" });
       return false;
     }
 
-    console.log(purchasePrice);
-    console.log(purchasePrice.toString());
     if (!purchasePrice || parseFloat(purchasePrice.toString()) < 0) {
       wx.showToast({ title: "请输入有效的购入价格", icon: "none" });
       return false;
@@ -335,6 +461,190 @@ Page({
   // 金额
   onPriceInput(e) {},
 
+  // 图标选择相关方法
+  loadIconData() {
+    // 配置要加载的系列（这里可以通过接口获取，目前硬编码）
+    const seriesToLoad = ["default", "blue", "green"];
+
+    const iconSeries = [];
+    const iconsBySeriesId = {};
+    let allIcons = [];
+
+    // 使用静态导入方式加载JSON文件
+    const loadSeries = (seriesId) => {
+      try {
+        let iconData;
+        if (seriesId === "default") {
+          iconData = require("../../static/icons/icon_default.json");
+        } else if (seriesId === "blue") {
+          iconData = require("../../static/icons/icon_blue.json");
+        } else if (seriesId === "green") {
+          iconData = require("../../static/icons/icon_green.json");
+        } else {
+          console.warn(`未知的图标系列: ${seriesId}`);
+          return;
+        }
+
+        // 为每个图标添加系列信息和完整路径
+        const iconsWithSeries = iconData.icons.map((icon) => ({
+          ...icon,
+          seriesId: iconData.seriesId,
+          seriesName: iconData.seriesName,
+          uniqueId: `${iconData.seriesId}_${icon.id}`, // 唯一标识
+          fullPath: `/static/icons/${iconData.seriesId}/${icon.filename}`, // 完整路径
+        }));
+
+        iconSeries.push({
+          seriesId: iconData.seriesId,
+          seriesName: iconData.seriesName,
+          icons: iconsWithSeries,
+        });
+
+        iconsBySeriesId[iconData.seriesId] = iconsWithSeries;
+        allIcons = allIcons.concat(iconsWithSeries);
+      } catch (error) {
+        console.error(`加载图标系列 ${seriesId} 失败:`, error);
+      }
+    };
+
+    // 加载所有配置的系列
+    seriesToLoad.forEach((seriesId) => {
+      loadSeries(seriesId);
+    });
+
+    this.setData({
+      iconSeries,
+      iconsBySeriesId,
+      allIcons,
+    });
+
+    // 初始化候选图标
+    this.updateCandidateIcons(this.data.formData.name);
+  },
+
+  updateCandidateIcons(itemName) {
+    if (!itemName || !this.data.allIcons.length) {
+      this.setData({
+        candidateIcons: this.data.allIcons.slice(0, 6), // 默认显示前6个
+      });
+      return;
+    }
+
+    const searchTerm = itemName.toLowerCase();
+    const matchedIcons = this.data.allIcons.filter((icon) => {
+      // 检查图标名称和关键词是否匹配
+      const nameMatch = icon.name.toLowerCase().includes(searchTerm);
+      const keywordMatch = icon.keywords.some((keyword) =>
+        keyword.toLowerCase().includes(searchTerm)
+      );
+      return nameMatch || keywordMatch;
+    });
+
+    // 如果匹配的图标少于6个，用其他图标补充
+    const candidates =
+      matchedIcons.length >= 6
+        ? matchedIcons.slice(0, 6)
+        : [
+            ...matchedIcons,
+            ...this.data.allIcons.filter(
+              (icon) => !matchedIcons.includes(icon)
+            ),
+          ].slice(0, 6);
+
+    this.setData({
+      candidateIcons: candidates,
+    });
+  },
+
+  toggleIconSelector() {
+    this.setData({
+      iconSelectorVisible: !this.data.iconSelectorVisible,
+    });
+  },
+
+  selectIcon(e) {
+    const iconUniqueId = e.currentTarget.dataset.icon;
+    const selectedIcon = this.data.allIcons.find(
+      (icon) => icon.uniqueId === iconUniqueId
+    );
+
+    this.setData({
+      "formData.icon": iconUniqueId,
+      selectedIconInfo: selectedIcon,
+      iconSelectorVisible: false,
+    });
+  },
+
+  selectIconByID(iconUniqueId) {
+    const selectedIcon = this.data.allIcons.find(
+      (icon) => icon.uniqueId === iconUniqueId
+    );
+
+    this.setData({
+      selectedIconInfo: selectedIcon,
+      iconSelectorVisible: false,
+    });
+  },
+
+  showAllIcons() {
+    this.setData({
+      allIconsDrawerVisible: true,
+      selectedIconInDrawer: this.data.formData.icon,
+    });
+  },
+
+  hideAllIconsDrawer() {
+    this.setData({
+      allIconsDrawerVisible: false,
+    });
+  },
+
+  onPopupVisibleChange(e) {
+    this.setData({
+      allIconsDrawerVisible: e.detail.visible,
+    });
+  },
+
+  selectIconInDrawer(e) {
+    const iconUniqueId = e.currentTarget.dataset.icon;
+    this.setData({
+      selectedIconInDrawer: iconUniqueId,
+    });
+  },
+
+  confirmIconSelection() {
+    const selectedIcon = this.data.allIcons.find(
+      (icon) => icon.uniqueId === this.data.selectedIconInDrawer
+    );
+
+    this.setData({
+      "formData.icon": this.data.selectedIconInDrawer,
+      selectedIconInfo: selectedIcon,
+      allIconsDrawerVisible: false,
+      iconSelectorVisible: false,
+    });
+  },
+
+  // Tab切换方法
+  onTabChange(e) {
+    const tabIndex = e.detail.value;
+    this.setData({
+      currentTabIndex: tabIndex,
+    });
+  },
+
+  // 获取当前选中图标的显示信息
+  getSelectedIconInfo() {
+    const selectedIcon = this.data.formData.icon;
+    if (!selectedIcon) return null;
+
+    // 从所有图标中找到选中的图标
+    const icon = this.data.allIcons.find(
+      (icon) => icon.uniqueId === selectedIcon
+    );
+    return icon;
+  },
+
   // 保存数据
   saveItem() {
     if (!this.itemManager || !this.validateForm()) {
@@ -346,16 +656,22 @@ Page({
       const saveData = {
         name: this.data.formData.name.trim(),
         brand: this.data.formData.brand,
-        category: this.data.formData.category,
-        icon: this.data.formData.icon,
+        category: this.data.isAssociated ? "其他" : this.data.formData.category, // 关联物品使用默认分类
+        icon: this.data.isAssociated ? "default_1" : this.data.formData.icon, // 关联物品使用默认图标
         images: this.data.formData.images,
         quantity: this.data.formData.quantity,
         purchasePrice: toCents(this.data.formData.purchasePrice),
         purchaseDate: this.data.formData.purchaseDate,
+        status: this.data.formData.status,
+        lifePeriod: this.data.formData.lifePeriod,
         retireDate: this.data.formData.retireDate || undefined,
-        averagePriceCalculationMethod:
-          this.data.formData.averagePriceCalculationMethod,
-        entityType: this.data.formData.entityType || undefined,
+        averagePriceCalculationMethod: this.data.isAssociated
+          ? AveragePriceCalculationMethod.BY_DAY
+          : this.data.formData.averagePriceCalculationMethod, // 关联物品使用默认计算方式
+        useTimes: this.data.isAssociated ? 1 : this.data.formData.useTimes || 1, // 关联物品使用默认次数
+        entityType: this.data.isAssociated
+          ? EntityType.PHYSICAL
+          : this.data.formData.entityType || EntityType.PHYSICAL, // 关联物品使用默认实体类型
         remarks: this.data.formData.remarks || undefined,
       };
       console.log("准备保存的数据:", saveData);
@@ -374,21 +690,18 @@ Page({
           icon: "success",
           duration: 1500,
         });
-      } else if (this.data.pageType === "associated") {
-        // 更新关联物品
-        this.itemManager.updateAssociatedItem(
-          this.data.parentId,
-          this.data.itemId,
-          saveData
-        );
-        wx.showToast({
-          title: "更新成功",
-          icon: "success",
-          duration: 1500,
-        });
-      } else {
-        // 更新主物品
-        this.itemManager.updateItem(this.data.itemId, saveData);
+      } else if (this.data.pageType === "edit") {
+        if (this.data.parentId) {
+          // 更新关联物品
+          this.itemManager.updateAssociatedItem(
+            this.data.parentId,
+            this.data.itemId,
+            saveData
+          );
+        } else {
+          // 更新主物品
+          this.itemManager.updateItem(this.data.itemId, saveData);
+        }
         wx.showToast({
           title: "更新成功",
           icon: "success",
@@ -408,7 +721,9 @@ Page({
     } catch (error) {
       console.error("保存失败:", error);
       const message =
-        error instanceof ValidationError ? error.message : "保存失败";
+        error.name === "ValidationError" || error.isValidationError
+          ? error.message
+          : "保存失败";
       wx.showToast({
         title: message,
         icon: "none",

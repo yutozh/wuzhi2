@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "seriesId": "blue",
+  "seriesName": "蓝色风格",
+  "icons": [
+    {
+      "id": "fridge",
+      "name": "冰箱",
+      "filename": "fridge.svg",
+      "keywords": [
+        "冰箱",
+        "家电",
+        "制冷",
+        "厨房",
+        "保鲜",
+        "fridge",
+        "refrigerator"
+      ]
+    },
+    {
+      "id": "washing_machine",
+      "name": "洗衣机",
+      "filename": "washing-machine.svg",
+      "keywords": [
+        "洗衣机",
+        "家电",
+        "清洗",
+        "衣物",
+        "washing",
+        "washer"
+      ]
+    }
+  ]
+}

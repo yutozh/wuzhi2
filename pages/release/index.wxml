@@ -1,30 +1,63 @@
-<t-navbar title="添加物品" left-arrow />
+<t-navbar title="{{title}}" left-arrow />
 
-<view class="release-container">
+<view class="release-container">  
   <view class="info-edit box">
+    <!-- 实体类型（仅主物品显示） -->
+    <t-cell class="info-edit__cell" title="类型">
+      <t-radio-group
+        bind:change="onEntityTypeChange"
+        borderless
+        defaultValue="{{formData.entityType}}"
+        options="{{entityTypes}}"
+        slot="note"
+        t-class="info-edit__gender"
+        value="{{formData.entityType}}"
+      />
+    </t-cell>
+    
     <t-cell class="info-edit__cell" title="物品名称">
       <t-input bind:change="onNameInput" borderless placeholder="请输入物品名称" slot="note" value="{{formData.name}}" />
     </t-cell>
     <t-cell class="info-edit__cell" title="品牌">
-      <t-input bind:change="onBrandInput" borderless placeholder="请输入物品名称" slot="note" value="{{formData.brand}}" />
+      <t-input bind:change="onBrandInput" borderless placeholder="请输入品牌名称" slot="note" value="{{formData.brand}}" />
     </t-cell>
-    <!-- <t-cell class="info-edit__cell" title="性别">
-      <t-radio-group
-        bind:change="onGenderChange"
-        borderless
-        defaultValue="{{personInfo.gender}}"
-        options="{{genderOptions}}"
-        slot="note"
-        t-class="info-edit__gender"
-        value="{{personInfo.gender}}"
-      />
-    </t-cell> -->
 
-    <!-- 物品类型 -->
-    <t-cell arrow bind:click="showPicker" data-mode="category" note="{{formData.category || '请选择物品类型'}}" title="物品类型" />
+    <!-- 图标选择（仅主物品显示） -->
+    <t-cell wx:if="{{!isAssociated}}" class="info-edit__cell icon-selector" title="图标" bind:click="toggleIconSelector">
+      <view class="icon-display" slot="note">
+        <image wx:if="{{selectedIconInfo}}" src="{{selectedIconInfo.fullPath}}" class="selected-icon" />
+        <text wx:else class="icon-placeholder">请选择图标</text>
+        <t-icon name="chevron-down" class="arrow-icon {{iconSelectorVisible ? 'arrow-up' : ''}}" />
+      </view>
+    </t-cell>
+
+    <!-- 图标候选列表（仅主物品显示） -->
+    <view wx:if="{{iconSelectorVisible && !isAssociated}}" class="icon-candidates">
+      <scroll-view scroll-x="true" class="icon-scroll">
+        <view class="icon-list">
+          <view wx:for="{{candidateIcons}}" wx:key="uniqueId" 
+                class="icon-item {{formData.icon === item.uniqueId ? 'selected' : ''}}"
+                bind:tap="selectIcon" data-icon="{{item.uniqueId}}">
+            <image src="{{item.fullPath}}" class="icon-image" />
+          </view>
+          <view class="more-icon-btn" bind:tap="showAllIcons">
+            <text>更多</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 物品类型（仅主物品显示） -->
+    <t-cell wx:if="{{!isAssociated}}"  arrow bind:click="showPicker" data-mode="category" note="{{formData.category || '请选择物品类型'}}" title="物品类型" />
 
     <!-- 购入日期 -->
     <t-cell arrow bind:click="showPicker" data-mode="purchaseDate" note="{{formData.purchaseDate || '请选择购入日期'}}" title="购入日期" />
+    
+    <!-- 物品状态 -->
+    <t-cell arrow bind:click="showPicker" data-mode="status" note="{{selectedStatusLabel || '请选择物品状态'}}" title="物品状态" />
+
+    <!-- 退役日期 -->
+    <t-cell arrow wx:if="{{selectedStatusLabel !== '使用中'}}" bind:click="showPicker" data-mode="retireDate" note="{{formData.retireDate || '请选择退役日期'}}" title="退役日期" />
 
     <!-- 价格 -->
     <t-cell class="info-edit__cell" title="价格">
@@ -40,8 +73,8 @@
       />
     </t-cell>
 
-    <!-- 成本计算方式 -->
-    <t-cell class="info-edit__cell" title="成本计算法">
+    <!-- 成本计算方式（仅主物品显示） -->
+    <t-cell wx:if="{{!isAssociated}}" class="info-edit__cell" title="成本计算法">
       <t-radio-group
         bind:change="onCalculationMethodChange"
         borderless
@@ -51,6 +84,11 @@
         t-class="info-edit__gender"
         value="{{formData.averagePriceCalculationMethod}}"
       />
+    </t-cell>
+
+    <!-- 已使用次数（仅主物品且按使用次数计算时显示） -->
+    <t-cell wx:if="{{!isAsociated && formData.averagePriceCalculationMethod === calculationMethods[1].value}}" class="info-edit__cell" title="已使用次数">
+      <t-stepper bind:change="onUseTimesChange" slot="note" defaultValue="1" theme="filled" min="0" max="9999" value="{{formData.useTimes}}" />
     </t-cell>
 
     <view class="desc box">
@@ -66,30 +104,13 @@
           slot="note"
         />
     </view>
-
+    
+    <!-- 底部间距，防止被固定按钮遮挡 -->
+    <view class="form-bottom-spacer"></view>
   </view>
-
-
-  <!-- <view class="upload box">
-    <t-upload t-class="upload-class" media-type="{{['image']}}" files="{{originFiles}}" gridConfig="{{gridConfig}}" bind:success="handleSuccess" bind:remove="handleRemove" max="4" />
-  </view>
-  <view class="desc box">
-    <view class="desc-label">添加描述</view>
-    <t-textarea t-class="desc-class" t-class-textarea="placeholder-class" placeholder="分享你此刻的想法" maxlength="500" disableDefaultPadding="{{true}}" indicator />
-  </view>
-  <view class="taggroup box">
-    <t-cell t-class-title="cell-title-class" t-class-note="cell-note-class" title="添加标签">
-      <block wx:for="{{tags}}" wx:key="index">
-        <t-check-tag t-class="tag-class" size="medium" default-checked="{{index===0}}" variant="dark" content="#{{item}}" slot="note" />
-      </block>
-    </t-cell>
-  </view>
-  <view class="location box">
-    <t-cell title="所在位置" hover arrow leftIcon="location" bindtap="gotoMap" />
-  </view> -->
   <view class="btngroup box">
     <!-- <t-button t-class="btn-class" theme="light" icon="file-copy" content="存草稿" size="large" bindtap="saveDraft"></t-button> -->
-    <t-button t-class="btn-class" theme="primary" icon="upload" content="发布" size="large" bindtap="saveItem"></t-button>
+    <t-button t-class="btn-class" theme="primary" icon="upload" content="{{btnOptionContent}}" size="large" bindtap="saveItem"></t-button>
   </view>
 </view>
 
@@ -100,9 +121,25 @@
   bind:pick="onAreaPick"
   cancelBtn="取消"
   confirmBtn="确认"
+  data-mode="status"
+  mode="status"
+  title="选择物品类别"
+  value="{{formData.status}}"
+  visible="{{statusVisible}}"
+>
+  <t-picker-item options="{{statusTypes}}" />
+</t-picker>
+
+<t-picker
+  bind:cancel="hidePicker"
+  bind:change="onPickerChange"
+  bind:close="hidePicker"
+  bind:pick="onAreaPick"
+  cancelBtn="取消"
+  confirmBtn="确认"
   data-mode="category"
   mode="category"
-  title="选择物品类别"
+  title="选择物品状态"
   value="{{formData.category}}"
   visible="{{categoryVisible}}"
 >
@@ -125,3 +162,47 @@
   value="{{personInfo.purchaseDate}}"
   visible="{{purchaseDateVisible}}"
 />
+
+<t-date-time-picker
+  auto-close
+  bind:cancel="hidePicker"
+  bind:change="onPickerChange"
+  cancelBtn="取消"
+  confirmBtn="确认"
+  data-mode="retireDate"
+  defaultValue="{{today}}"
+  format="YYYY-MM-DD"
+  mode="date"
+  popup-props="{{ { usingCustomNavbar: true } }}"
+  end="{{today}}"
+  title="选择退役日期"
+  value="{{personInfo.retireDate}}"
+  visible="{{retireDateVisible}}"
+/>
+
+<!-- 全部图标选择弹窗 -->
+<t-popup bind:visible-change="onPopupVisibleChange" 
+         placement="bottom" visible="{{allIconsDrawerVisible}}" 
+         class="icon-popup">
+  <view class="popup-header">
+    <text class="popup-title">选择图标</text>
+    <t-button theme="primary" size="small" bind:tap="confirmIconSelection">确认</t-button>
+  </view>
+  
+  <t-tabs bind:change="onTabChange" value="{{currentTabIndex}}" 
+          class="icon-tabs" scroll-threshold="4">
+    <t-tab-panel wx:for="{{iconSeries}}" wx:key="seriesId" 
+                 label="{{item.seriesName}}" value="{{index}}">
+      <scroll-view scroll-y="true" class="tab-content-scroll">
+        <view class="all-icons-grid">
+          <view wx:for="{{item.icons}}" wx:for-item="icon" wx:key="uniqueId" 
+                class="all-icon-item {{selectedIconInDrawer === icon.uniqueId ? 'selected' : ''}}"
+                bind:tap="selectIconInDrawer" data-icon="{{icon.uniqueId}}">
+            <image src="{{icon.fullPath}}" class="all-icon-image" />
+            <text class="icon-name">{{icon.name}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </t-tab-panel>
+  </t-tabs>
+</t-popup>
