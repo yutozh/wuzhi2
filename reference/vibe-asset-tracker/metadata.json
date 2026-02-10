@@ -1,0 +1,8 @@
+
+{
+  "name": "Vibe Asset Tracker",
+  "description": "A high-end personal asset and inventory tracker with a clean iOS-inspired design, featuring value statistics, categorized collections, and AI-powered product insights.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -5,6 +5,44 @@ import createBus from "./utils/eventBus";
 import { connectSocket, fetchUnreadNum } from "./mock/chat";
 import { ItemManager } from "~/utils/ItemManager";
 
+// 在应用启动前就过滤警告
+// (function () {
+//   const originalWarn = console.warn;
+//   const originalLog = console.log;
+//   const originalError = console.error;
+
+//   const filterMessage = (message) => {
+//     return (
+//       message.includes("wx.getSystemInfoSync") ||
+//       message.includes("getSystemInfoSync") ||
+//       message.includes("is deprecated") ||
+//       message.includes("Please use wx.getSystemSetting") ||
+//       message.includes("wx.getAppAuthorizeSetting") ||
+//       message.includes("wx.getDeviceInfo") ||
+//       message.includes("wx.getWindowInfo") ||
+//       message.includes("wx.getAppBaseInfo")
+//     );
+//   };
+
+//   console.warn = function (...args) {
+//     const message = args.join(" ");
+//     if (filterMessage(message)) return;
+//     originalWarn.apply(console, args);
+//   };
+
+//   console.log = function (...args) {
+//     const message = args.join(" ");
+//     if (filterMessage(message)) return;
+//     originalLog.apply(console, args);
+//   };
+
+//   console.error = function (...args) {
+//     const message = args.join(" ");
+//     if (filterMessage(message)) return;
+//     originalError.apply(console, args);
+//   };
+// })();
+
 if (config.isMock) {
   Mock();
 }

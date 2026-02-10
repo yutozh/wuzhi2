@@ -1,0 +1,159 @@
+<view class="stats-container">
+  <!-- 头部标题 -->
+  <view class="header">
+    <text class="title">数据统计</text>
+    <text class="subtitle">记录你的资产成长轨迹</text>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-cards">
+    <view class="card card-indigo">
+      <text class="card-label">总价值</text>
+      <text class="card-value">{{totalValueDisplay}}</text>
+    </view>
+    <view class="card card-emerald">
+      <text class="card-label">本月新增</text>
+      <text class="card-value">{{newThisMonth}}</text>
+    </view>
+    <view class="card card-blue">
+      <text class="card-label">记录天数</text>
+      <text class="card-value">{{recordingDays}}<text class="unit">d</text></text>
+    </view>
+  </view>
+
+  <!-- 统计粒度和时间范围选择 -->
+  <view class="time-filter-section">
+    <view class="filter-row-compact">
+      <!-- 统计粒度 -->
+      <picker mode="selector" range="{{granularityOptions}}" range-key="label" value="{{granularityIndex}}" bindchange="onGranularityChange">
+        <view class="filter-picker compact">
+          <text class="picker-text">{{granularityOptions[granularityIndex].label}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+
+      <!-- 时间范围 - 按年 -->
+      <view class="time-range-compact" wx:if="{{granularity === 'year'}}">
+        <picker mode="selector" range="{{yearOptions}}" range-key="label" bindchange="onStartYearChange">
+          <view class="filter-picker compact">
+            <text class="picker-text">{{startYear}}年</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+        <text class="range-separator">-</text>
+        <picker mode="selector" range="{{yearOptions}}" range-key="label" bindchange="onEndYearChange">
+          <view class="filter-picker compact">
+            <text class="picker-text">{{endYear}}年</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 时间范围 - 按月 -->
+      <view class="time-range-compact" wx:if="{{granularity === 'month'}}">
+        <picker mode="multiSelector" range="{{[yearOptions, monthOptions]}}" range-key="label" bindchange="onStartYearMonthChange">
+          <view class="filter-picker compact">
+            <text class="picker-text">{{startMonthYear}}/{{startMonth}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+        <text class="range-separator">-</text>
+        <picker mode="multiSelector" range="{{[yearOptions, monthOptions]}}" range-key="label" bindchange="onEndYearMonthChange">
+          <view class="filter-picker compact">
+            <text class="picker-text">{{endMonthYear}}/{{endMonth}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <!-- 开发测试按钮 -->
+  <view class="test-section" wx:if="{{totalItems === 0}}">
+    <view class="test-button" bindtap="generateTestData">
+      <text class="test-text">生成测试数据</text>
+    </view>
+  </view>
+
+  <!-- 图表1：物品统计 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">物品统计</text>
+      <view class="chart-type-toggle" bindtap="onChart1TypeChange">
+        <text class="toggle-option {{chart1Type === 'count' ? 'active' : ''}}">按数量</text>
+        <text class="toggle-divider">/</text>
+        <text class="toggle-option {{chart1Type === 'value' ? 'active' : ''}}">按价值</text>
+      </view>
+    </view>
+    <view class="chart-container">
+      <qiun-wx-ucharts 
+        type="column"
+        opts="{{chart1Opts}}"
+        chartData="{{chart1ChartData}}"
+      />
+    </view>
+  </view>
+
+  <!-- 图表2：物品总值趋势 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">物品总值趋势</text>
+      <view class="chart-type-toggle" bindtap="onChart2TypeChange">
+        <text class="toggle-option {{chart2Type === 'count' ? 'active' : ''}}">按数量</text>
+        <text class="toggle-divider">/</text>
+        <text class="toggle-option {{chart2Type === 'value' ? 'active' : ''}}">按价值</text>
+      </view>
+    </view>
+    <view class="chart-container">
+      <qiun-wx-ucharts 
+        type="line"
+        opts="{{chart2Opts}}"
+        chartData="{{chart2ChartData}}"
+      />
+    </view>
+  </view>
+
+  <!-- 图表3：价值分布 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">价值分布</text>
+      <view class="chart-type-toggle" bindtap="onChart3TypeChange">
+        <text class="toggle-option {{chart3Type === 'count' ? 'active' : ''}}">按数量</text>
+        <text class="toggle-divider">/</text>
+        <text class="toggle-option {{chart3Type === 'value' ? 'active' : ''}}">按价值</text>
+      </view>
+    </view>
+    <view class="distribution-container">
+      <view class="pie-chart">
+        <qiun-wx-ucharts 
+          type="ring"
+          opts="{{chart3Opts}}"
+          chartData="{{chart3ChartData}}"
+        />
+      </view>
+      <view class="legend">
+        <view class="legend-item" wx:for="{{chart3Data}}" wx:key="name">
+          <view class="legend-dot" style="background-color: {{item.color}}"></view>
+          <text class="legend-name">{{item.name}}</text>
+          <text class="legend-value">{{chart3Type === 'count' ? item.countPercent : item.valuePercent}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Top5 分类详细展示 -->
+    <view class="top5-section" wx:if="{{chart3Top5.length > 0}}">
+      <view class="top5-title">分类价值 Top 5</view>
+      <view class="top5-list">
+        <view class="top5-item" wx:for="{{chart3Top5}}" wx:key="name">
+          <view class="top5-header">
+            <text class="top5-name">{{item.name}}</text>
+            <text class="top5-value">{{item.valueDisplay}}</text>
+          </view>
+          <view class="top5-progress">
+            <view class="top5-progress-bar" style="width: {{item.valuePercent}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

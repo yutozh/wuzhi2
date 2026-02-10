@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "数据统计",
+    "enablePullDownRefresh": true,
+    "usingComponents": {
+        "qiun-wx-ucharts": "@qiun/wx-ucharts"
+    }
+}

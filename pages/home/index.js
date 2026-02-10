@@ -33,14 +33,25 @@ Page({
     items: [], // 当前展示的物品列表（经过筛选和搜索）
     allItems: [], // 所有物品的完整列表
     viewMode: "list", // 视图模式：'list' | 'card'
-    totalCount: 0,
-    totalValue: 0,
+    totalCount: 0, // 全部物品总数量（不受筛选影响）
+    totalValue: 0, // 全部物品总价值（不受筛选影响）
+    filteredCount: 0, // 筛选后的物品数量
+    filteredValue: 0, // 筛选后的物品价值
     showAssociatedCount: false,
     showFilterModal: false,
     showDetailModal: false,
     currentItem: null,
     currentItemDetail: null, // 当前查看的物品详情（包含格式化数据）
     useTimesEditing: false, // 是否正在编辑使用次数
+
+    // 排序相关
+    sortOptions: [
+      { label: "按记录时间倒序", value: "recordTime_desc" },
+      { label: "按买入时间倒序", value: "purchaseTime_desc" },
+      { label: "按金额由高到低", value: "price_desc" },
+      { label: "按金额由低到高", value: "price_asc" },
+    ],
+    currentSortIndex: 0, // 当前排序选项索引
 
     searchQuery: "",
     selectedCategory: "全部",
@@ -68,6 +79,14 @@ Page({
 
     // 图标数据
     iconsByUniqueId: {}, // 按唯一ID索引的图标数据
+
+    // 新增的UI状态
+    showSearch: false, // 搜索框展开状态
+    categoryDragging: false, // 分类拖拽状态
+    categoryStartX: 0, // 分类拖拽起始位置
+    categoryScrollLeft: 0, // 分类滚动位置
+    drawerAnimated: false, // 抽屉动画状态
+    isSorting: false, // 排序动画状态
   },
 
   // 搜索防抖定时器
@@ -254,17 +273,34 @@ Page({
     const allItems = this.itemManager.getAllItems();
     const categories = ["全部", ...this.itemManager.getCategories()];
 
-    // 为每个物品添加分类颜色和图标路径
+    // 为每个物品添加分类颜色、图标路径和格式化日期
     const itemsWithColor = allItems.map((item) => ({
       ...item,
       categoryColor: this.getCategoryColor(item.category),
       iconPath: this.getIconPath(item.icon), // 添加图标路径
+      purchaseDateFormatted: this.formatDate(item.purchaseDate), // 格式化日期
     }));
 
-    // 保存完整物品列表
+    // 计算全部物品的统计信息（不受筛选影响）
+    const totalCount = itemsWithColor.length;
+    const totalValueInCents = itemsWithColor.reduce((sum, item) => {
+      const itemValue =
+        item.purchasePrice +
+        (item.associatedItems || []).reduce(
+          (assSum, assItem) => assSum + assItem.purchasePrice,
+          0
+        );
+      return sum + itemValue;
+    }, 0);
+    const totalValueInYuan = toPrice(totalValueInCents);
+    const formattedTotalValue = this.formatPriceWithCommas(totalValueInYuan);
+
+    // 保存完整物品列表和全局统计
     this.setData({
       allItems: itemsWithColor,
       categories,
+      totalCount,
+      totalValue: formattedTotalValue,
     });
 
     // 应用筛选和搜索
@@ -357,6 +393,9 @@ Page({
       );
     }
 
+    // 应用排序
+    filtered = this.applySorting(filtered);
+
     // 检测物品数量是否超过100，启用分页
     const usePagination = filtered.length > 100;
 
@@ -371,8 +410,8 @@ Page({
       this.loadPage(1, filtered);
     } else {
       // 数据量不大，直接显示全部
-      const totalCount = filtered.length;
-      const totalValueInCents = filtered.reduce((sum, item) => {
+      const filteredCount = filtered.length;
+      const filteredValueInCents = filtered.reduce((sum, item) => {
         const itemValue =
           item.purchasePrice +
           (item.associatedItems || []).reduce(
@@ -381,15 +420,16 @@ Page({
           );
         return sum + itemValue;
       }, 0);
-      const totalValueInYuan = toPrice(totalValueInCents);
-      const formattedValue = this.formatPriceWithCommas(totalValueInYuan);
+      const filteredValueInYuan = toPrice(filteredValueInCents);
+      const formattedFilteredValue =
+        this.formatPriceWithCommas(filteredValueInYuan);
 
       // 批量更新数据（一次 setData 调用）
       this.setData({
         items: filtered,
         filteredItems: filtered,
-        totalCount,
-        totalValue: formattedValue,
+        filteredCount,
+        filteredValue: formattedFilteredValue,
         hasMoreData: false,
         currentPage: 1,
       });
@@ -414,9 +454,9 @@ Page({
     // 如果是第一页，直接设置；否则追加到现有数据
     const items = page === 1 ? pageItems : [...this.data.items, ...pageItems];
 
-    // 计算统计信息（基于完整的筛选列表）
-    const totalCount = filtered.length;
-    const totalValueInCents = filtered.reduce((sum, item) => {
+    // 计算筛选后的统计信息（基于完整的筛选列表）
+    const filteredCount = filtered.length;
+    const filteredValueInCents = filtered.reduce((sum, item) => {
       const itemValue =
         item.purchasePrice +
         (item.associatedItems || []).reduce(
@@ -425,21 +465,91 @@ Page({
         );
       return sum + itemValue;
     }, 0);
-    const totalValueInYuan = toPrice(totalValueInCents);
-    const formattedValue = this.formatPriceWithCommas(totalValueInYuan);
+    const filteredValueInYuan = toPrice(filteredValueInCents);
+    const formattedFilteredValue =
+      this.formatPriceWithCommas(filteredValueInYuan);
 
     // 批量更新数据
     this.setData({
       items,
-      totalCount,
-      totalValue: formattedValue,
+      filteredCount,
+      filteredValue: formattedFilteredValue,
       currentPage: page,
       hasMoreData,
       isLoadingMore: false,
     });
   },
 
-  // 加载更多数据
+  // 应用排序
+  applySorting(items) {
+    const { currentSortIndex, sortOptions } = this.data;
+    const sortOption = sortOptions[currentSortIndex];
+
+    if (!sortOption) return items;
+
+    const sortedItems = [...items];
+
+    switch (sortOption.value) {
+      case "recordTime_desc":
+        // 按记录时间倒序（创建时间）
+        return sortedItems.sort((a, b) => {
+          const timeA = new Date(a.createdAt || a.purchaseDate).getTime();
+          const timeB = new Date(b.createdAt || b.purchaseDate).getTime();
+          return timeB - timeA;
+        });
+
+      case "purchaseTime_desc":
+        // 按买入时间倒序
+        return sortedItems.sort((a, b) => {
+          const timeA = new Date(a.purchaseDate).getTime();
+          const timeB = new Date(b.purchaseDate).getTime();
+          return timeB - timeA;
+        });
+
+      case "price_desc":
+        // 按金额由高到低
+        return sortedItems.sort((a, b) => {
+          const priceA = a.purchasePrice || 0;
+          const priceB = b.purchasePrice || 0;
+          return priceB - priceA;
+        });
+
+      case "price_asc":
+        // 按金额由低到高
+        return sortedItems.sort((a, b) => {
+          const priceA = a.purchasePrice || 0;
+          const priceB = b.purchasePrice || 0;
+          return priceA - priceB;
+        });
+
+      default:
+        return sortedItems;
+    }
+  },
+
+  // 切换排序方式
+  toggleSort() {
+    const { currentSortIndex, sortOptions } = this.data;
+    const nextIndex = (currentSortIndex + 1) % sortOptions.length;
+
+    // 添加排序动画类
+    this.setData({
+      currentSortIndex: nextIndex,
+      isSorting: true,
+    });
+
+    // 延迟应用筛选和排序，让动画先开始
+    setTimeout(() => {
+      this.filterItems();
+
+      // 动画完成后移除动画类
+      setTimeout(() => {
+        this.setData({
+          isSorting: false,
+        });
+      }, 400);
+    }, 100);
+  },
   loadMore() {
     const { hasMoreData, isLoadingMore, currentPage } = this.data;
 
@@ -453,37 +563,6 @@ Page({
 
     // 加载下一页
     this.loadPage(currentPage + 1);
-  },
-
-  // 更新统计信息
-  updateStatistics() {
-    const { items } = this.data;
-
-    // 计算总数量（只计算当前展示的物品）
-    const totalCount = items.length;
-
-    // 计算总价值（包括关联物品）
-    const totalValueInCents = items.reduce((sum, item) => {
-      const itemValue =
-        item.purchasePrice +
-        (item.associatedItems || []).reduce(
-          (assSum, assItem) => assSum + assItem.purchasePrice,
-          0
-        );
-      return sum + itemValue;
-    }, 0);
-
-    // 转换为元（价格）
-    const totalValueInYuan = toPrice(totalValueInCents);
-
-    // 格式化价格显示（千位分隔符）
-    const formattedValue = this.formatPriceWithCommas(totalValueInYuan);
-
-    // 更新统计数据
-    this.setData({
-      totalCount,
-      totalValue: formattedValue,
-    });
   },
 
   // 格式化价格，添加千位分隔符
@@ -586,6 +665,131 @@ Page({
     }
   },
 
+  // 记录使用次数
+  recordUsage() {
+    const item = this.data.currentItem;
+    if (!item || !this.itemManager) return;
+
+    try {
+      // 增加使用次数
+      const newUseTimes = (item.useTimes || 1) + 1;
+      this.itemManager.updateItem(item.id, {
+        useTimes: newUseTimes,
+      });
+
+      // 更新当前显示的物品数据
+      const updatedItem = { ...item, useTimes: newUseTimes };
+      const updatedItemDetail = this.formatItemDetail(updatedItem);
+
+      this.setData({
+        currentItem: updatedItem,
+        currentItemDetail: updatedItemDetail,
+      });
+
+      // 重新加载列表数据
+      this.loadData();
+
+      wx.showToast({
+        title: "使用记录已更新",
+        icon: "success",
+        duration: 1500,
+      });
+    } catch (error) {
+      console.error("记录使用失败:", error);
+      wx.showToast({
+        title: "记录失败",
+        icon: "none",
+        duration: 2000,
+      });
+    }
+  },
+
+  // 增加使用次数
+  increaseUseTimes() {
+    const item = this.data.currentItem;
+    if (!item || !this.itemManager) return;
+
+    try {
+      const newUseTimes = (item.useTimes || 1) + 1;
+      this.itemManager.updateItem(item.id, {
+        useTimes: newUseTimes,
+      });
+
+      // 更新当前显示的物品数据
+      const updatedItem = { ...item, useTimes: newUseTimes };
+      const updatedItemDetail = this.formatItemDetail(updatedItem);
+
+      this.setData({
+        currentItem: updatedItem,
+        currentItemDetail: updatedItemDetail,
+      });
+
+      // 重新加载列表数据
+      this.loadData();
+
+      wx.showToast({
+        title: "使用次数已增加",
+        icon: "success",
+        duration: 1000,
+      });
+    } catch (error) {
+      console.error("更新使用次数失败:", error);
+      wx.showToast({
+        title: "更新失败",
+        icon: "none",
+        duration: 1500,
+      });
+    }
+  },
+
+  // 减少使用次数
+  decreaseUseTimes() {
+    const item = this.data.currentItem;
+    if (!item || !this.itemManager) return;
+
+    const currentUseTimes = item.useTimes || 1;
+    if (currentUseTimes <= 0) {
+      wx.showToast({
+        title: "使用次数不能小于0",
+        icon: "none",
+        duration: 1500,
+      });
+      return;
+    }
+
+    try {
+      const newUseTimes = currentUseTimes - 1;
+      this.itemManager.updateItem(item.id, {
+        useTimes: newUseTimes,
+      });
+
+      // 更新当前显示的物品数据
+      const updatedItem = { ...item, useTimes: newUseTimes };
+      const updatedItemDetail = this.formatItemDetail(updatedItem);
+
+      this.setData({
+        currentItem: updatedItem,
+        currentItemDetail: updatedItemDetail,
+      });
+
+      // 重新加载列表数据
+      this.loadData();
+
+      wx.showToast({
+        title: "使用次数已减少",
+        icon: "success",
+        duration: 1000,
+      });
+    } catch (error) {
+      console.error("更新使用次数失败:", error);
+      wx.showToast({
+        title: "更新失败",
+        icon: "none",
+        duration: 1500,
+      });
+    }
+  },
+
   // 加载视图模式偏好
   loadViewModePreference() {
     try {
@@ -629,16 +833,28 @@ Page({
   },
 
   // 显示物品详情弹窗
+  // 显示物品详情弹窗
   showItemDetail(item) {
     // 格式化物品详情数据
     const itemDetail = this.formatItemDetail(item);
 
     this.setData({
-      showDetailModal: true,
       currentItem: item,
       currentItemDetail: itemDetail,
       useTimesEditing: false, // 重置编辑状态
     });
+
+    // 先显示遮罩，然后延迟显示抽屉动画
+    this.setData({
+      showDetailModal: true,
+    });
+
+    // 使用 setTimeout 确保 DOM 更新后再触发动画
+    setTimeout(() => {
+      this.setData({
+        drawerAnimated: true,
+      });
+    }, 50);
   },
 
   // 格式化物品详情数据
@@ -658,6 +874,13 @@ Page({
       SERVICE: "服务",
     };
 
+    // 实体类型图标映射
+    const entityTypeIcons = {
+      PHYSICAL: "📦",
+      VIRTUAL: "💾",
+      SERVICE: "🛠️",
+    };
+
     // 成本计算方式标签映射
     const calculationMethodLabels = {
       [AveragePriceCalculationMethod.BY_DAY]: "按天数",
@@ -667,6 +890,19 @@ Page({
     const showUseTimes =
       item.averagePriceCalculationMethod ===
       AveragePriceCalculationMethod.BY_USAGE_COUNT;
+
+    // 格式化关联物品，添加图标和类型信息
+    const formattedAssociatedItems = (item.associatedItems || []).map(
+      (assItem) => ({
+        ...assItem,
+        entityType: assItem.entityType || "PHYSICAL",
+        entityTypeIcon:
+          entityTypeIcons[assItem.entityType || "PHYSICAL"] || "📦",
+        purchasePriceDisplay: this.formatPriceWithCommas(
+          toPrice(assItem.purchasePrice)
+        ),
+      })
+    );
 
     return {
       ...item,
@@ -681,6 +917,7 @@ Page({
       showUseTimes: showUseTimes,
       showRetireDate: item.status !== StatusType.NORMAL,
       associatedItemsCount: (item.associatedItems || []).length,
+      associatedItems: formattedAssociatedItems,
       totalAssociatedValue: this.calculateAssociatedItemsValue(
         item.associatedItems || []
       ),
@@ -699,12 +936,20 @@ Page({
 
   // 关闭详情弹窗
   closeDetailModal() {
+    // 先隐藏抽屉动画
     this.setData({
-      showDetailModal: false,
-      currentItem: null,
-      currentItemDetail: null,
-      useTimesEditing: false, // 重置编辑状态
+      drawerAnimated: false,
     });
+
+    // 延迟隐藏整个模态框
+    setTimeout(() => {
+      this.setData({
+        showDetailModal: false,
+        currentItem: null,
+        currentItemDetail: null,
+        useTimesEditing: false, // 重置编辑状态
+      });
+    }, 400); // 与动画时长一致
   },
 
   // 阻止事件冒泡（防止点击弹窗内容时关闭弹窗）
@@ -964,6 +1209,59 @@ Page({
     this.setData({
       items,
       allItems,
+    });
+  },
+
+  // 切换搜索框显示状态
+  toggleSearch() {
+    this.setData({
+      showSearch: !this.data.showSearch,
+    });
+  },
+
+  // 分类拖拽开始
+  onCategoryTouchStart(e) {
+    const touch = e.touches[0];
+    this.setData({
+      categoryDragging: true,
+      categoryStartX: touch.pageX,
+    });
+
+    // 获取当前滚动位置
+    const query = wx.createSelectorQuery();
+    query.select(".category-scroll").scrollOffset();
+    query.exec((res) => {
+      if (res && res[0]) {
+        this.setData({
+          categoryScrollLeft: res[0].scrollLeft,
+        });
+      }
+    });
+  },
+
+  // 分类拖拽移动
+  onCategoryTouchMove(e) {
+    if (!this.data.categoryDragging) return;
+
+    const touch = e.touches[0];
+    const deltaX = this.data.categoryStartX - touch.pageX;
+    const newScrollLeft = this.data.categoryScrollLeft + deltaX * 2; // 增加滚动速度
+
+    // 设置滚动位置
+    wx.createSelectorQuery()
+      .select(".category-scroll")
+      .node()
+      .exec((res) => {
+        if (res && res[0] && res[0].node) {
+          res[0].node.scrollLeft = Math.max(0, newScrollLeft);
+        }
+      });
+  },
+
+  // 分类拖拽结束
+  onCategoryTouchEnd() {
+    this.setData({
+      categoryDragging: false,
     });
   },
 });
