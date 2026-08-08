@@ -23,6 +23,62 @@
       ]
     },
     {
+      "root": "pages/my/profile-edit",
+      "name": "profile-edit",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/data-sync",
+      "name": "data-sync",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/category-manage",
+      "name": "category-manage",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/settings",
+      "name": "settings",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/help",
+      "name": "help",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/feedback",
+      "name": "feedback",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/vip",
+      "name": "vip",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "pages/my/vip-success",
+      "name": "vip-success",
+      "pages": [
+        "index"
+      ]
+    },
+    {
       "root": "pages/chat",
       "name": "chat",
       "pages": [
@@ -66,8 +122,8 @@
     }
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F0F8FF",
     "navigationBarTitleText": "Weixin",
     "navigationBarTextStyle": "black"
   },

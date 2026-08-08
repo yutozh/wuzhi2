@@ -1,0 +1,8 @@
+{
+    "navigationBarTitleText": "数据同步与导出",
+    "navigationBarBackgroundColor": "#f8f9ff",
+    "usingComponents": {
+        "t-toast": "tdesign-miniprogram/toast/toast",
+        "t-dialog": "tdesign-miniprogram/dialog/dialog"
+    }
+}

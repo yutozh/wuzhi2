@@ -1,0 +1,41 @@
+<view class="success-page">
+  <!-- 背景装饰 -->
+  <view class="success-bg">
+    <view class="glow-circle glow-1"></view>
+    <view class="glow-circle glow-2"></view>
+    <view class="glow-circle glow-3"></view>
+  </view>
+
+  <!-- 主要内容 -->
+  <view class="success-content">
+    <!-- VIP徽章动画 -->
+    <view class="badge-animation">
+      <image class="badge-img" src="{{badgeImg}}" mode="aspectFit" />
+      <view class="badge-glow"></view>
+    </view>
+
+    <!-- 成功文案 -->
+    <view class="success-text">
+      <text class="success-title">开通成功！</text>
+      <text class="success-subtitle">欢迎成为{{vipName}}</text>
+    </view>
+
+    <!-- 会员特权简介 -->
+    <view class="features-preview">
+      <view wx:for="{{features}}" wx:key="*this" class="feature-item">
+        <text class="material-icons feature-icon">check_circle</text>
+        <text class="feature-text">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="btn-primary" bindtap="onStartExperience">
+        开始体验
+      </button>
+      <button class="btn-secondary" bindtap="onBackToProfile">
+        返回个人中心
+      </button>
+    </view>
+  </view>
+</view>

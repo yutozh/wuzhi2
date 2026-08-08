@@ -1,0 +1,316 @@
+.category-manage-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+.page-header {
+  padding: 48rpx 40rpx 32rpx;
+}
+
+.header-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #8e8e93;
+}
+
+.page-content {
+  padding: 0 40rpx;
+}
+
+// 添加分类区域
+.add-section {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+}
+
+.input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: #f2f2f7;
+  border-radius: 20rpx;
+  padding: 24rpx 32rpx;
+}
+
+.input-icon {
+  font-size: 48rpx;
+  color: #8e8e93;
+}
+
+.category-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #1c1c1e;
+  font-weight: 500;
+}
+
+.add-btn {
+  width: 96rpx;
+  height: 96rpx;
+  background: #1c1c1e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  border: none;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.add-btn::after {
+  border: none;
+}
+
+.add-btn:active {
+  background: #2c2c2e;
+  transform: scale(0.95);
+}
+
+.add-btn .material-icons {
+  font-size: 48rpx;
+  color: #ffffff;
+}
+
+// 分类列表
+.category-list {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f2f2f7;
+}
+
+.list-icon {
+  font-size: 48rpx;
+  color: #1c1c1e;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.category-chip {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 24rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.category-chip-default {
+  background: #f2f2f7;
+  color: #1c1c1e;
+  border: 2rpx solid #e5e5ea;
+}
+
+.category-chip-custom {
+  background: #1c1c1e;
+  color: #ffffff;
+  border: 2rpx solid #1c1c1e;
+}
+
+.category-name {
+  font-weight: 600;
+}
+
+.category-delete {
+  width: 36rpx;
+  height: 36rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.category-delete:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.9);
+}
+
+.delete-icon {
+  font-size: 24rpx;
+  color: #ffffff;
+}
+
+// 分类行列表
+.category-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 16rpx;
+  border-bottom: 1rpx solid #f2f2f7;
+  gap: 16rpx;
+  background: #ffffff;
+  position: relative;
+}
+
+.category-row:last-child {
+  border-bottom: none;
+}
+
+// 非拖动行：transform 变化时有过渡动画
+.category-row-animated {
+  transition: transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.category-row-dragging {
+  background: #f0f8ff;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+  border-radius: 16rpx;
+  border-bottom: none;
+  opacity: 0.95;
+  // 拖动行不加 transition，跟手需要即时响应
+  transition: none;
+}
+
+// 拖动手柄
+.drag-handle {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: grab;
+}
+
+.drag-icon {
+  font-size: 36rpx;
+  color: #c7c7cc;
+  line-height: 1;
+}
+
+// 分类名
+.category-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+}
+
+// 右侧操作区
+.category-row-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.default-badge {
+  font-size: 22rpx;
+  color: #8e8e93;
+  background: #f2f2f7;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+  font-weight: 500;
+}
+
+.category-delete {
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.category-delete:active {
+  background: #ffe5e5;
+}
+
+.delete-icon {
+  font-size: 32rpx;
+  color: #ff3b30;
+}
+.info-card {
+  background: #fff9e6;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  gap: 24rpx;
+  border: 2rpx solid #ffe5b3;
+}
+
+.info-icon {
+  font-size: 48rpx;
+  color: #ff9500;
+  flex-shrink: 0;
+}
+
+.info-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.info-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+.info-desc {
+  font-size: 24rpx;
+  color: #8e8e93;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}

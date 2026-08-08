@@ -1,0 +1,93 @@
+<t-toast id="t-toast" />
+
+<view class="category-manage-page">
+  <view class="page-header">
+    <text class="header-title">物品类别管理</text>
+    <text class="header-subtitle">拖动 ☰ 可调整顺序</text>
+  </view>
+
+  <view class="page-content">
+    <!-- 添加分类 -->
+    <view class="add-section">
+      <view class="input-wrapper">
+        <text class="material-icons input-icon">add_circle_outline</text>
+        <input 
+          class="category-input" 
+          value="{{newCategory}}" 
+          placeholder="输入新分类名称"
+          bindinput="onCategoryInput"
+          bindconfirm="onAddCategory"
+        />
+      </view>
+      <button class="add-btn" bindtap="onAddCategory">
+        <text class="material-icons">add</text>
+      </button>
+    </view>
+
+    <!-- 分类列表 -->
+    <view class="category-list" id="category-list-container">
+      <view class="list-header">
+        <text class="material-icons list-icon">category</text>
+        <text class="list-title">当前分类 ({{categories.length}})</text>
+      </view>
+
+      <view class="category-rows">
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="name"
+          id="category-row-{{index}}"
+          class="category-row {{draggingIndex === index ? 'category-row-dragging' : (draggingIndex >= 0 ? 'category-row-animated' : '')}} {{item.isDefault ? 'category-row-default' : 'category-row-custom'}}"
+          style="transform: translateY({{draggingIndex === index ? dragOffsetY : item.translateY}}px); {{draggingIndex === index ? 'z-index: 100;' : ''}}"
+        >
+          <!-- 拖动手柄 -->
+          <view 
+            class="drag-handle"
+            catchtouchstart="onDragStart"
+            catchtouchmove="onDragMove"
+            catchtouchend="onDragEnd"
+            data-index="{{index}}"
+          >
+            <text class="drag-icon">☰</text>
+          </view>
+
+          <!-- 分类名 -->
+          <text class="category-name">{{item.name}}</text>
+
+          <!-- 右侧：默认标签 or 删除按钮 -->
+          <view class="category-row-right">
+            <text wx:if="{{item.isDefault}}" class="default-badge">默认</text>
+            <view 
+              wx:if="{{!item.isDefault}}" 
+              class="category-delete"
+              bindtap="onDeleteCategory"
+              data-index="{{index}}"
+              data-name="{{item.name}}"
+            >
+              <text class="material-icons delete-icon">close</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 说明 -->
+    <view class="info-card">
+      <text class="material-icons info-icon">info</text>
+      <view class="info-text">
+        <text class="info-title">温馨提示</text>
+        <text class="info-desc">• 默认分类不可删除\n• 拖动左侧 ☰ 可调整顺序\n• 顺序同步影响首页筛选和添加物品页面</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 确认对话框 -->
+<t-dialog
+  visible="{{showDialog}}"
+  title="{{dialogTitle}}"
+  content="{{dialogContent}}"
+  confirm-btn="确认"
+  cancel-btn="取消"
+  bind:confirm="onDialogConfirm"
+  bind:cancel="onDialogCancel"
+/>

@@ -6,6 +6,7 @@ import {
 } from "~/static/types/ItemTypes";
 import { formatToTwoDecimal, toCents, toPrice } from "~/utils/util";
 import { ValidationError } from "~/utils/itemManager";
+import { isLoggedIn } from "~/utils/auth";
 
 const app = getApp();
 
@@ -122,6 +123,8 @@ Page({
       return v;
     },
     quantityError: false,
+    quantityNotOne: false, // 数量是否不为1
+    totalPriceDisplay: "", // 实时总价显示
     // 图标选择相关
     iconSelectorVisible: false,
     candidateIcons: [],
@@ -133,6 +136,8 @@ Page({
     iconsBySeriesId: {}, // 按系列ID分组的图标数据
     currentTabIndex: 0, // 当前选中的tab索引
     selectedIconInfo: null, // 当前选中图标的详细信息
+    // 登录提示弹窗
+    showLoginModal: false,
   },
 
   onLoad(options) {
@@ -197,7 +202,7 @@ Page({
       const parentItem = this.itemManager.getItem(this.data.parentId);
       if (parentItem) {
         item = parentItem.associatedItems.find(
-          (assoc) => assoc.id === this.data.itemId
+          (assoc) => assoc.id === this.data.itemId,
         );
       }
       this.setData({ title: "编辑关联物品" });
@@ -211,6 +216,10 @@ Page({
     }
 
     if (item) {
+      const quantity = item.quantity;
+      const price = toPrice(item.purchasePrice);
+      const quantityNotOne =
+        quantity !== undefined && parseFloat(quantity) !== 1;
       this.setData({
         formData: {
           name: item.name,
@@ -219,7 +228,7 @@ Page({
           icon: item.icon,
           quantity: item.quantity,
           images: [...item.images],
-          purchasePrice: toPrice(item.purchasePrice),
+          purchasePrice: price,
           purchaseDate: item.purchaseDate.split("T")[0],
           lifePeriod: item.lifePeriod,
           status: item.status,
@@ -229,9 +238,25 @@ Page({
           entityType: item.entityType,
           remarks: item.remarks || "",
         },
+        quantityNotOne,
       });
+      // 初始化总价显示
+      this._updateTotalPriceDisplay(quantity, price);
       // 显示选中的图标
       this.selectIconByID(item.icon);
+    }
+  },
+
+  // 计算并更新总价显示
+  _updateTotalPriceDisplay(quantity, price) {
+    const q = parseFloat(quantity);
+    const p = parseFloat(price);
+    const quantityNotOne = !isNaN(q) && q !== 1 && quantity !== "";
+    if (quantityNotOne && !isNaN(p) && price !== "") {
+      const total = (q * p).toFixed(2);
+      this.setData({ totalPriceDisplay: total, quantityNotOne });
+    } else {
+      this.setData({ totalPriceDisplay: "", quantityNotOne });
     }
   },
   handleSuccess(e) {
@@ -333,6 +358,8 @@ Page({
         priceError: !isNumber,
       });
     }
+    // 更新总价显示
+    this._updateTotalPriceDisplay(this.data.formData.quantity, val);
   },
 
   onPurchaseDateChange(e) {
@@ -378,13 +405,17 @@ Page({
 
     if (reg.test(val)) {
       // ✅ 合法输入，更新值
+      const quantityNum = parseFloat(val) || 0;
+      const quantityNotOne = val !== "" && quantityNum !== 1;
       this.setData({
         "formData.quantity": val,
         quantityError: false,
+        quantityNotOne,
       });
+      // 更新总价显示
+      this._updateTotalPriceDisplay(val, this.data.formData.purchasePrice);
     } else {
       // ❌ 非法输入（多余小数位、多个小数点、非法字符）
-      // val = formatToTwoDecimal(e.detail.value);
       this.setData({
         quantityError: true,
       });
@@ -408,6 +439,15 @@ Page({
     const { mode } = e.currentTarget.dataset;
     this.setData({
       [`${mode}Visible`]: false,
+    });
+  },
+  // 关闭所有选择器（点击遮罩时调用）
+  hideAllPickers() {
+    this.setData({
+      statusVisible: false,
+      categoryVisible: false,
+      purchaseDateVisible: false,
+      retireDateVisible: false,
     });
   },
   onAreaPick(e) {
@@ -535,7 +575,7 @@ Page({
       // 检查图标名称和关键词是否匹配
       const nameMatch = icon.name.toLowerCase().includes(searchTerm);
       const keywordMatch = icon.keywords.some((keyword) =>
-        keyword.toLowerCase().includes(searchTerm)
+        keyword.toLowerCase().includes(searchTerm),
       );
       return nameMatch || keywordMatch;
     });
@@ -547,7 +587,7 @@ Page({
         : [
             ...matchedIcons,
             ...this.data.allIcons.filter(
-              (icon) => !matchedIcons.includes(icon)
+              (icon) => !matchedIcons.includes(icon),
             ),
           ].slice(0, 6);
 
@@ -565,7 +605,7 @@ Page({
   selectIcon(e) {
     const iconUniqueId = e.currentTarget.dataset.icon;
     const selectedIcon = this.data.allIcons.find(
-      (icon) => icon.uniqueId === iconUniqueId
+      (icon) => icon.uniqueId === iconUniqueId,
     );
 
     this.setData({
@@ -577,7 +617,7 @@ Page({
 
   selectIconByID(iconUniqueId) {
     const selectedIcon = this.data.allIcons.find(
-      (icon) => icon.uniqueId === iconUniqueId
+      (icon) => icon.uniqueId === iconUniqueId,
     );
 
     this.setData({
@@ -614,7 +654,7 @@ Page({
 
   confirmIconSelection() {
     const selectedIcon = this.data.allIcons.find(
-      (icon) => icon.uniqueId === this.data.selectedIconInDrawer
+      (icon) => icon.uniqueId === this.data.selectedIconInDrawer,
     );
 
     this.setData({
@@ -640,7 +680,7 @@ Page({
 
     // 从所有图标中找到选中的图标
     const icon = this.data.allIcons.find(
-      (icon) => icon.uniqueId === selectedIcon
+      (icon) => icon.uniqueId === selectedIcon,
     );
     return icon;
   },
@@ -651,6 +691,37 @@ Page({
       return;
     }
 
+    // 校验登录状态（仅新增时校验，编辑时已有数据无需再提示）
+    if (this.data.pageType === "add" && !isLoggedIn()) {
+      this.setData({ showLoginModal: true });
+      return;
+    }
+
+    this._doSaveItem();
+  },
+
+  // 登录提示弹窗：用户选择"继续（不登录）"
+  onContinueWithoutLogin() {
+    this.setData({ showLoginModal: false });
+    this._doSaveItem();
+  },
+
+  // 登录提示弹窗：用户选择"去登录"
+  onGoLogin() {
+    this.setData({ showLoginModal: false });
+    wx.switchTab({ url: "/pages/my/index" });
+  },
+
+  // 关闭登录提示弹窗
+  onCloseLoginModal() {
+    this.setData({ showLoginModal: false });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {},
+
+  // 实际执行保存逻辑
+  _doSaveItem() {
     try {
       // 准备保存的数据
       const saveData = {
@@ -672,7 +743,10 @@ Page({
         entityType: this.data.isAssociated
           ? EntityType.PHYSICAL
           : this.data.formData.entityType || EntityType.PHYSICAL, // 关联物品使用默认实体类型
-        remarks: this.data.formData.remarks || undefined,
+        remarks:
+          this.data.formData.remarks !== undefined
+            ? this.data.formData.remarks
+            : "",
       };
       console.log("准备保存的数据:", saveData);
       console.log("this.data:", this.data);
@@ -696,7 +770,7 @@ Page({
           this.itemManager.updateAssociatedItem(
             this.data.parentId,
             this.data.itemId,
-            saveData
+            saveData,
           );
         } else {
           // 更新主物品

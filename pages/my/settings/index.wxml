@@ -1,0 +1,83 @@
+<t-toast id="t-toast" />
+
+<view class="settings-page">
+  <view class="page-header">
+    <text class="header-title">应用设置</text>
+    <text class="header-subtitle">个性化您的使用体验</text>
+  </view>
+
+  <view class="page-content">
+    <!-- 显示设置 -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="material-icons section-icon">palette</text>
+        <text class="section-title">显示设置</text>
+      </view>
+      <view class="setting-list">
+        <view class="setting-item">
+          <view class="setting-content">
+            <text class="material-icons setting-icon">grid_view</text>
+            <view class="setting-text">
+              <text class="setting-title">卡片显示</text>
+              <text class="setting-desc">首页物品卡片样式</text>
+            </view>
+          </view>
+          <t-switch value="{{settings.cardView}}" bindchange="onCardViewChange" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 关于 -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="material-icons section-icon">info</text>
+        <text class="section-title">关于</text>
+      </view>
+      <view class="setting-list">
+        <view class="setting-item" bindtap="onAbout">
+          <view class="setting-content">
+            <text class="material-icons setting-icon">apps</text>
+            <view class="setting-text">
+              <text class="setting-title">关于应用</text>
+              <text class="setting-desc">版本 1.0.0</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+
+        <view class="setting-item" bindtap="onHelp">
+          <view class="setting-content">
+            <text class="material-icons setting-icon">help</text>
+            <view class="setting-text">
+              <text class="setting-title">帮助中心</text>
+              <text class="setting-desc">使用指南和常见问题</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+
+        <view class="setting-item" bindtap="onFeedback">
+          <view class="setting-content">
+            <text class="material-icons setting-icon">feedback</text>
+            <view class="setting-text">
+              <text class="setting-title">意见反馈</text>
+              <text class="setting-desc">告诉我们您的想法</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 版权信息 -->
+    <view class="copyright">
+      <text class="copyright-text">Made with ❤️ by Vibe Team</text>
+      <text class="copyright-text">© 2026 Vibe Asset Tracker</text>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-btn" bindtap="onLogout">
+      <text>退出登录</text>
+    </view>
+  </view>
+</view>

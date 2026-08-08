@@ -1,0 +1,119 @@
+<t-toast id="t-toast" />
+
+<view class="vip-page">
+  <!-- 顶部VIP特权展示区 -->
+  <view class="vip-hero">
+    <view class="vip-hero-content">
+      <text class="vip-crown">👑</text>
+      <text class="vip-title">VIP会员特权</text>
+      <text class="vip-subtitle">解锁全部高级功能，享受专属服务</text>
+    </view>
+    <view class="vip-glow"></view>
+  </view>
+
+  <!-- VIP等级卡片 -->
+  <view class="vip-levels">
+    <view 
+      wx:for="{{vipLevels}}" 
+      wx:key="level"
+      class="vip-level-card {{item.level === currentVipLevel ? 'vip-level-active' : ''}}"
+      style="border-color: {{item.color}}"
+    >
+      <view class="vip-level-header">
+        <image class="vip-level-badge" src="{{item.badgeImg}}" mode="aspectFit" />
+        <view class="vip-level-info">
+          <text class="vip-level-name" style="color: {{item.color}}">{{item.name}}</text>
+          <text class="vip-level-price">{{item.price}}</text>
+        </view>
+      </view>
+      <view wx:if="{{item.level === currentVipLevel}}" class="vip-level-current">当前等级</view>
+    </view>
+  </view>
+
+  <!-- 会员权益对比 -->
+  <view class="vip-comparison">
+    <view class="section-title">会员权益对比</view>
+    <view class="comparison-table">
+      <view class="comparison-header">
+        <view class="comparison-cell comparison-feature">功能</view>
+        <view class="comparison-cell">普通用户</view>
+        <view class="comparison-cell comparison-vip">VIP会员</view>
+      </view>
+      <view wx:for="{{features}}" wx:key="name" class="comparison-row">
+        <view class="comparison-cell comparison-feature">{{item.name}}</view>
+        <view class="comparison-cell">
+          <text class="material-icons comparison-icon {{item.free ? 'icon-check' : 'icon-close'}}">
+            {{item.free ? 'check_circle' : 'cancel'}}
+          </text>
+        </view>
+        <view class="comparison-cell comparison-vip">
+          <text class="material-icons comparison-icon icon-check">check_circle</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 会员特权列表 -->
+  <view class="vip-benefits">
+    <view class="section-title">尊享特权</view>
+    <view class="benefits-list">
+      <view wx:for="{{benefits}}" wx:key="title" class="benefit-item">
+        <view class="benefit-icon-wrapper">
+          <image class="benefit-icon-img" src="{{item.icon}}" mode="aspectFit" />
+        </view>
+        <view class="benefit-content">
+          <text class="benefit-title">{{item.title}}</text>
+          <text class="benefit-desc">{{item.desc}}</text>
+        </view>
+        <text class="material-icons benefit-check">check_circle</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 开通方式选择 -->
+  <view class="vip-actions">
+    <view class="section-title">开通会员</view>
+    
+    <!-- 支付方式（预留） -->
+    <view class="action-card action-card-disabled">
+      <view class="action-header">
+        <text class="material-icons action-icon">payment</text>
+        <text class="action-title">在线支付</text>
+      </view>
+      <text class="action-desc">支持微信支付、支付宝等多种支付方式</text>
+      <view class="action-badge">即将开放</view>
+    </view>
+
+    <!-- 兑换码方式 -->
+    <view class="action-card">
+      <view class="action-header">
+        <text class="material-icons action-icon">redeem</text>
+        <text class="action-title">兑换码开通</text>
+      </view>
+      <text class="action-desc">输入兑换码即可开通会员</text>
+      
+      <view class="code-input-wrapper">
+        <input 
+          class="code-input" 
+          type="text" 
+          placeholder="请输入兑换码"
+          value="{{redeemCode}}"
+          bindinput="onCodeInput"
+          maxlength="20"
+        />
+        <button 
+          class="code-submit-btn {{redeemCode ? 'code-submit-active' : ''}}"
+          bindtap="onRedeemCode"
+          disabled="{{!redeemCode}}"
+        >
+          兑换
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="vip-footer">
+    <text class="footer-text">开通会员即表示同意《会员服务协议》</text>
+  </view>
+</view>

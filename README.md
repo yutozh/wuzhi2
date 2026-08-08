@@ -1,70 +1,179 @@
-# TDesign 通用页面模板
+# 物品记录小程序
 
-基于 TDesign 打造的通用页面模板，包含通用的登陆注册、个人中心、设置中心、信息流等等功能。
+一款基于微信小程序的个人物品管理工具，帮助你记录和追踪日常消费品的购入信息、使用状态和成本摊销情况。
 
-## 模版功能预览
+## 功能介绍
 
-### 首页
+### 首页 — 物品管理
 
-<div style="display: flex">
-  <img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/home-1.png">
-  <img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/home-2.png">
-</div>
+- 展示所有已记录物品的列表，支持列表 / 卡片两种视图
+- 按分类筛选，支持关键词搜索（物品名称 / 品牌），带防抖处理
+- 多种排序方式：按记录时间、购入时间、金额高低排序
+- 物品数量超过 100 条时自动分页懒加载
+- 点击物品可弹出详情抽屉，支持直接编辑使用次数
+- 展示总物品数、总价值及当前筛选范围的统计数据
+- 下拉刷新
 
-### 信息发布
+### 添加 / 编辑物品（发布页）
 
-<img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/publish-1.png">
+填写以下信息来记录一件物品：
 
-### 搜索页
+| 字段             | 说明                                         |
+| ---------------- | -------------------------------------------- |
+| 物品名称         | 必填                                         |
+| 品牌             | 可选                                         |
+| 分类             | 必填（默认分类：电子产品、服装、家居用品等） |
+| 图标             | 从内置图标库选择，支持按名称模糊匹配候选图标 |
+| 数量             | 支持小数，多件时自动计算总价                 |
+| 购入价格         | 必填，内部以分存储以规避浮点数精度问题       |
+| 购入日期         | 必填                                         |
+| 物品状态         | 使用中 / 退役报废 / 遗失 / 损坏              |
+| 实体类型         | 实物 / 虚拟产品 / 服务                       |
+| 平均成本计算方式 | 按天数 或 按使用次数                         |
+| 备注             | 可选                                         |
 
-<img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/search-1.png">
+支持为主物品添加**关联物品**（附件、配件等），关联物品单独计价，并汇总展示在主物品详情中。
 
-### 个人中心
-<div style="display: flex">
-  <img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/user-1.png">
-  <img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/user-2.png">
-  <img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/user-3.png">
-</div>
+### 统计页
 
+- 概览卡片：总价值、物品总数、本月新增、记录天数
+- 时间粒度可切换：按月 / 按年
+- 支持自定义时间范围（按月最多 12 个月）
+- 三张图表：
+  - **柱状图**：各时间段购入数量 / 价值
+  - **折线图**：物品总量 / 总价值累计趋势
+  - **环形图**：各分类数量 / 价值占比（最多展示 8 个分类）
+- 图表类型可在数量和价值之间切换
 
-### 设置中心
+### 我的
 
-<img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/setting-1.png">
+- 微信一键登录，支持昵称 / 头像编辑
+- VIP 等级展示（普通 / VIP / 年费 VIP / 永久 VIP）
+- 快捷入口：开通会员、数据同步与导出、物品类别管理、应用设置
 
-### 消息中心
+### 其他页面
 
-<img width="375" alt="image" src="https://tdesign.gtimg.com/miniprogram/template/message-1.png">
+- **搜索页**：独立搜索页面（分包加载）
+- **聊天页**：基于 WebSocket 的实时消息，支持键盘弹出适配
+- **登录页**：手机号验证码登录 / 账号密码登录两种方式
+- **数据中心**：数据查看与管理
+- **设置页**：应用偏好设置
 
+## 技术栈
 
-## 开发预览
-### 目录结构（TODO: 生成目录结构树）
+- **框架**：微信小程序原生开发
+- **UI 组件库**：[TDesign 小程序版](https://tdesign.tencent.com/miniprogram)
+- **图表库**：uCharts
+- **日期处理**：Day.js
+- **本地存储**：wx.setStorageSync / getStorageSync（无需后端即可运行）
+- **网络通信**：自封装 request 工具 + WebSocket（Mock 模式下不依赖真实接口）
 
-
-### 在开发者工具中预览
-
-```bash
-# 安装项目依赖
-npm install
+## 目录结构
 
 ```
+├── api/                    # 网络请求封装
+├── behaviors/              # 复用行为（useToast 等）
+├── components/             # 公共组件（card、nav 导航栏）
+├── config/                 # 配置文件
+├── custom-tab-bar/         # 自定义底部 Tab 栏
+├── i18n/                   # 国际化文案（基础版）
+├── miniprogram_npm/        # 构建后的 npm 包（tdesign-miniprogram、dayjs）
+├── mock/                   # Mock 数据与拦截逻辑
+├── pages/
+│   ├── home/               # 首页（物品列表）
+│   ├── stats/              # 统计页
+│   ├── my/                 # 个人中心及子页面
+│   │   ├── info-edit/      # 基本信息编辑
+│   │   ├── profile-edit/   # 头像昵称编辑
+│   │   ├── data-sync/      # 数据同步与导出
+│   │   ├── category-manage/# 物品类别管理
+│   │   ├── settings/       # 应用设置
+│   │   ├── help/           # 帮助中心
+│   │   ├── feedback/       # 意见反馈
+│   │   ├── vip/            # 会员开通
+│   │   └── vip-success/    # 开通成功
+│   ├── search/             # 搜索（分包）
+│   ├── release/            # 添加 / 编辑物品（分包）
+│   ├── chat/               # 聊天（分包）
+│   ├── login/              # 登录（分包）
+│   ├── loginCode/          # 验证码登录（分包）
+│   ├── dataCenter/         # 数据中心（分包）
+│   └── setting/            # 设置（分包）
+├── static/                 # 静态资源（图片、图标、字体）
+├── utils/                  # 工具函数
+│   ├── auth.js             # 登录态管理
+│   ├── eventBus.js         # 全局事件总线
+│   ├── itemManager.js      # 物品数据 CRUD 核心逻辑
+│   ├── mockData.js         # 生成测试数据
+│   ├── options.js          # 分类颜色、时间筛选等常量
+│   └── util.js             # 价格格式化等通用工具
+├── app.js                  # 应用入口（WebSocket、更新管理器）
+├── app.json                # 页面路由与分包配置
+└── app.less                # 全局样式
+```
 
-打开[微信开发者工具](https://mp.weixin.qq.com/debug/wxadoc/dev/devtools/download.html)，导入整个项目，构建 npm 包，就可以预览示例了。
+## 本地开发
 
-### 基础库版本
+### 环境要求
 
-最低基础库版本`^2.6.5`
+- [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html) 最新稳定版
+- 基础库版本 ≥ `2.6.5`
+- Node.js（用于构建 npm 包）
 
+### 启动步骤
 
-## 贡献成员
+1. 克隆仓库到本地
 
-<a href="https://github.com/TDesignOteam/tdesign-miniprogram-starter/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=TDesignOteam/tdesign-miniprogram-starter" />
-</a>
+```bash
+git clone https://github.com/TDesignOteam/tdesign-miniprogram-starter.git
+```
 
-## 反馈
+2. 安装依赖
 
-有任何问题，建议通过 [Github issues](https://github.com/TDesignOteam/tdesign-miniprogram-starter/issues) 反馈。
+```bash
+npm install
+```
+
+3. 安装依赖
+
+```bash
+pnpm install
+```
+
+4. 启动开发模式（weapp-vite 会监听文件变化并自动编译）
+
+```bash
+pnpm run dev
+```
+
+> 如需启动时自动打开微信开发者工具，使用 `pnpm run dev:open`
+
+5. 打开微信开发者工具，导入整个项目目录，即可实时预览
+
+### 其他命令
+
+| 命令                | 说明                 |
+| ------------------- | -------------------- |
+| `pnpm run build`    | 生产构建             |
+| `pnpm run open`     | 打开微信开发者工具   |
+| `pnpm run lint`     | 代码检查             |
+| `pnpm run lint:fix` | 自动修复代码风格问题 |
+| `pnpm run g`        | 生成页面/组件脚手架  |
+
+### Mock 模式
+
+项目默认关闭 Mock 模式（`config.js` 中 `isMock: false`）。如需在无后端环境下体验完整功能，将其改为 `true`：
+
+```js
+// config.js
+export default {
+  isMock: true,
+  baseUrl: "http://localhost:3000/api",
+};
+```
+
+开启后，所有网络请求将被 `mock/` 目录下的本地数据拦截。
 
 ## 开源协议
 
-TDesign 遵循 [MIT 协议](https://github.com/TDesignOteam/tdesign-miniprogram-starter/blob/main/LICENSE)。
+本项目遵循 [MIT 协议](./LICENSE)。

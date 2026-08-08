@@ -1,0 +1,8 @@
+{
+    "navigationBarTitleText": "VIP会员",
+    "navigationBarBackgroundColor": "#1c1c1e",
+    "navigationBarTextStyle": "white",
+    "usingComponents": {
+        "t-toast": "tdesign-miniprogram/toast/toast"
+    }
+}

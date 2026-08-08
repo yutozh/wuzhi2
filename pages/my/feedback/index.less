@@ -1,0 +1,194 @@
+.feedback-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 48rpx);
+}
+
+.page-header {
+  padding: 48rpx 40rpx 32rpx;
+}
+
+.header-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #8e8e93;
+}
+
+.page-content {
+  padding: 0 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+}
+
+// 表单分区
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+}
+
+.required {
+  color: #ff3b30;
+  margin-left: 4rpx;
+}
+
+.optional {
+  font-size: 24rpx;
+  color: #8e8e93;
+  font-weight: 400;
+}
+
+// 分类 chips
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.chip {
+  padding: 14rpx 32rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #e5e5ea;
+  background: #ffffff;
+  font-size: 28rpx;
+  color: #1c1c1e;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.chip:active {
+  opacity: 0.7;
+}
+
+.chip-active {
+  background: #1c1c1e;
+  border-color: #1c1c1e;
+  color: #ffffff;
+}
+
+// 文本域
+.textarea-wrapper {
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #e5e5ea;
+  padding: 24rpx 32rpx;
+  min-height: 240rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+// 通用输入框容器
+.input-wrapper {
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #e5e5ea;
+  padding: 28rpx 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.text-input {
+  width: 100%;
+  font-size: 30rpx;
+  color: #1c1c1e;
+}
+
+// 验证码行
+.captcha-row {
+  display: flex;
+  gap: 24rpx;
+  align-items: stretch;
+}
+
+// 验证码图片区域
+.captcha-image-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 240rpx;
+  height: 88rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #e5e5ea;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.captcha-image {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.captcha-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.captcha-loading-text,
+.captcha-refresh-text {
+  font-size: 24rpx;
+  color: #8e8e93;
+}
+
+.captcha-image-wrapper:active {
+  opacity: 0.8;
+}
+
+// 验证码输入框
+.captcha-input-wrapper {
+  flex: 1;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+}
+
+// 提交按钮
+.submit-btn {
+  width: 100%;
+  height: 96rpx;
+  background: #1c1c1e;
+  color: #ffffff;
+  border-radius: 24rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  transition: opacity 0.15s ease;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+.submit-btn:active {
+  opacity: 0.8;
+}
+
+.submit-btn-disabled {
+  opacity: 0.5;
+}

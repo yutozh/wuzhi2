@@ -88,7 +88,7 @@ export class ItemManager {
 
     if (
       !Object.values(AveragePriceCalculationMethod).includes(
-        data.averagePriceCalculationMethod
+        data.averagePriceCalculationMethod,
       )
     ) {
       throw new ValidationError("无效的均价计算方式");
@@ -158,7 +158,7 @@ export class ItemManager {
       throw new Error("主物品不存在");
     }
     const associatedItem = parentItem.associatedItems.find(
-      (item) => item.id === associatedId
+      (item) => item.id === associatedId,
     );
     if (!associatedItem) {
       throw new Error("关联物品不存在");
@@ -235,7 +235,7 @@ export class ItemManager {
     }
 
     const associatedItem = parentItem.associatedItems.find(
-      (item) => item.id === associatedId
+      (item) => item.id === associatedId,
     );
     if (!associatedItem) {
       throw new Error("关联物品不存在");
@@ -261,7 +261,7 @@ export class ItemManager {
     }
 
     const index = parentItem.associatedItems.findIndex(
-      (item) => item.id === associatedId
+      (item) => item.id === associatedId,
     );
     if (index === -1) {
       return false;
@@ -429,7 +429,6 @@ export class ItemManager {
       const data = wx.getStorageSync(this.CATEGORIES_STORAGE_KEY);
       if (data) {
         const savedCategories = JSON.parse(data);
-        // 合并默认分类和用户添加的分类，确保默认分类不会丢失
         const defaultCategories = [
           "数码产品",
           "衣物鞋包",
@@ -441,9 +440,9 @@ export class ItemManager {
           "其他",
         ];
 
-        // 创建一个Set来去重，并保持顺序（默认分类在前）
-        const allCategories = [...defaultCategories];
-        savedCategories.forEach((category) => {
+        // 以已保存的顺序为准，补充缺失的默认分类到末尾
+        const allCategories = [...savedCategories];
+        defaultCategories.forEach((category) => {
           if (!allCategories.includes(category)) {
             allCategories.push(category);
           }
@@ -487,7 +486,7 @@ export class ItemManager {
         categories: this.categories,
       },
       null,
-      2
+      2,
     );
   }
 

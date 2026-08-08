@@ -1,0 +1,33 @@
+<view class="help-page">
+  <view class="page-header">
+    <text class="header-title">帮助中心</text>
+    <text class="header-subtitle">新手入门 · 常见问题</text>
+  </view>
+
+  <view class="qa-list">
+    <view
+      wx:for="{{qaList}}"
+      wx:key="id"
+      class="qa-item {{item.expanded ? 'qa-item-expanded' : ''}}"
+      bindtap="onToggle"
+      data-id="{{item.id}}"
+    >
+      <view class="qa-question">
+        <text class="q-label">Q</text>
+        <text class="q-text">{{item.question}}</text>
+        <text class="q-arrow {{item.expanded ? 'q-arrow-up' : ''}}">▾</text>
+      </view>
+      <view wx:if="{{item.expanded}}" class="qa-answer">
+        <text class="a-label">A</text>
+        <text class="a-text">{{item.answer}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="help-footer">
+    <text class="footer-text">没找到答案？</text>
+    <view class="footer-link" bindtap="goFeedback">
+      <text class="footer-link-text">去意见反馈</text>
+    </view>
+  </view>
+</view>

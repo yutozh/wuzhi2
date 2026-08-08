@@ -1,0 +1,438 @@
+// ============================================
+// VIP Page Styles (VIP会员页面样式)
+// ============================================
+
+.vip-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: 80rpx;
+}
+
+// ============================================
+// Hero Section (顶部特权展示区)
+// ============================================
+
+.vip-hero {
+  position: relative;
+  background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+  padding: 120rpx 48rpx 80rpx;
+  overflow: hidden;
+}
+
+.vip-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.vip-crown {
+  font-size: 120rpx;
+  line-height: 1;
+  animation: crownFloat 3s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20rpx) rotate(5deg);
+  }
+}
+
+.vip-title {
+  font-size: 56rpx;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 2rpx;
+}
+
+.vip-subtitle {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.vip-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600rpx;
+  height: 600rpx;
+  background: radial-gradient(
+    circle,
+    rgba(212, 175, 55, 0.3) 0%,
+    transparent 70%
+  );
+  animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+// ============================================
+// VIP Levels (VIP等级卡片)
+// ============================================
+
+.vip-levels {
+  padding: 48rpx 40rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.vip-level-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  border: 3rpx solid #e5e5ea;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.vip-level-active {
+  border-width: 4rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  transform: scale(1.02);
+}
+
+.vip-level-header {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.vip-level-badge {
+  width: 80rpx;
+  height: 80rpx;
+  flex-shrink: 0;
+}
+
+.vip-level-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.vip-level-name {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.vip-level-price {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8e8e93;
+}
+
+.vip-level-current {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  background: #1c1c1e;
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+// ============================================
+// Section Title (章节标题)
+// ============================================
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 32rpx;
+}
+
+// ============================================
+// Comparison Table (权益对比表格)
+// ============================================
+
+.vip-comparison {
+  padding: 0 40rpx 48rpx;
+}
+
+.comparison-table {
+  background: #ffffff;
+  border-radius: 32rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+}
+
+.comparison-header {
+  display: flex;
+  background: #f2f2f7;
+  border-bottom: 2rpx solid #e5e5ea;
+}
+
+.comparison-row {
+  display: flex;
+  border-bottom: 1rpx solid #f2f2f7;
+}
+
+.comparison-row:last-child {
+  border-bottom: none;
+}
+
+.comparison-cell {
+  flex: 1;
+  padding: 32rpx 24rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #1c1c1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.comparison-feature {
+  flex: 1.5;
+  text-align: left;
+  font-weight: 600;
+  justify-content: flex-start;
+}
+
+.comparison-vip {
+  background: rgba(212, 175, 55, 0.05);
+  font-weight: 600;
+}
+
+.comparison-icon {
+  font-size: 40rpx;
+}
+
+.icon-check {
+  color: #34c759;
+}
+
+.icon-close {
+  color: #d1d1d6;
+}
+
+// ============================================
+// Benefits List (会员特权列表)
+// ============================================
+
+.vip-benefits {
+  padding: 0 40rpx 48rpx;
+}
+
+.benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.benefit-item {
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+  transition: all 0.2s ease;
+}
+
+.benefit-item:active {
+  transform: scale(0.98);
+  background: #f8fafc;
+}
+
+.benefit-icon-wrapper {
+  width: 80rpx;
+  height: 80rpx;
+  background: linear-gradient(135deg, #f2f2f7 0%, #e5e5ea 100%);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.benefit-icon-img {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.benefit-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.benefit-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+.benefit-desc {
+  font-size: 24rpx;
+  color: #8e8e93;
+  line-height: 1.4;
+}
+
+.benefit-check {
+  font-size: 48rpx;
+  color: #d4af37;
+  flex-shrink: 0;
+}
+
+// ============================================
+// Actions Section (开通方式)
+// ============================================
+
+.vip-actions {
+  padding: 0 40rpx 48rpx;
+}
+
+.action-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+  position: relative;
+}
+
+.action-card-disabled {
+  opacity: 0.5;
+}
+
+.action-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.action-icon {
+  font-size: 48rpx;
+  color: #1c1c1e;
+}
+
+.action-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+.action-desc {
+  font-size: 26rpx;
+  color: #8e8e93;
+  margin-bottom: 24rpx;
+}
+
+.action-badge {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  background: #1c1c1e;
+  color: #ffffff;
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+}
+
+// ============================================
+// Code Input (兑换码输入)
+// ============================================
+
+.code-input-wrapper {
+  display: flex;
+  gap: 16rpx;
+}
+
+.code-input {
+  flex: 1;
+  background: #f2f2f7;
+  border-radius: 16rpx;
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  color: #1c1c1e;
+  border: 2rpx solid #e5e5ea;
+}
+
+.code-submit-btn {
+  background: #d1d1d6;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 700;
+  padding: 24rpx 48rpx;
+  border-radius: 16rpx;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.code-submit-active {
+  background: #1c1c1e;
+}
+
+.code-submit-btn:active {
+  transform: scale(0.95);
+}
+
+// ============================================
+// Footer (底部说明)
+// ============================================
+
+.vip-footer {
+  text-align: center;
+  padding: 32rpx 40rpx;
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: #aeaeb2;
+}
+
+// ============================================
+// Material Icons Support
+// ============================================
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga";
+}

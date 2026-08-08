@@ -1,41 +1,27 @@
-<!-- 顶部环境光背景 -->
-<view class="ambient-glow"></view>
+<!-- 顶部背景区域 -->
+<view class="hero-background">
+  <image class="hero-bg-image" src="/static/background/bg1.png" mode="aspectFill" />
+  <view class="hero-content">
+    <!-- <view class="hero-title">我的资产</view> -->
+    <view class="hero-stats-row">
+      <view class="hero-stat-item">
+        <view class="hero-stat-label">物品金额</view>
+        <view class="hero-stat-value value-amount">¥{{totalValue}}</view>
+      </view>
+      <view class="hero-stat-divider"></view>
+      <view class="hero-stat-item">
+        <view class="hero-stat-label">物品件数</view>
+        <view class="hero-stat-value">{{totalCount}}</view>
+      </view>
+    </view>
+    <view class="hero-stat-sub">
+      最近7天 活跃
+    </view>
+  </view>
+</view>
 
 <view class="home-container">
   <view class="home-content">
-    <!-- Portfolio Card -->
-    <view class="portfolio-card">
-      <view class="portfolio-content">
-        <view class="portfolio-header">
-          <view class="portfolio-label">Net Worth</view>
-          <view class="portfolio-trend">
-            <text class="trend-icon">📈</text>
-            <text class="trend-text">+8.2%</text>
-          </view>
-        </view>
-        
-        <view class="portfolio-value">
-          <text class="currency-symbol">¥</text>
-          <text class="value-amount">{{totalValue}}</text>
-        </view>
-        
-        <view class="portfolio-stats">
-          <view class="stat-item">
-            <view class="stat-label">Vault Size</view>
-            <view class="stat-value">{{totalCount}} <text class="stat-unit">ITEMS</text></view>
-          </view>
-          <view class="stat-divider"></view>
-          <view class="stat-item">
-            <view class="stat-label">Activity</view>
-            <view class="stat-value">High <text class="stat-unit">7D</text></view>
-          </view>
-        </view>
-      </view>
-      
-      <!-- 装饰元素 -->
-      <view class="portfolio-decoration-1"></view>
-      <view class="portfolio-decoration-2"></view>
-    </view>
 
     <!-- 分类筛选器和工具栏 -->
     <view class="category-section">
@@ -164,14 +150,14 @@
                   <view class="item-name">{{item.name}}</view>
                   <view class="item-meta">
                     <text class="item-category">{{item.category}}</text>
-                    <view class="meta-dot"></view>
+                    <text class="meta-dot">·</text>
                     <text class="item-date">{{item.purchaseDateFormatted}}</text>
                   </view>
                 </view>
               </view>
               <view class="item-right">
                 <view class="item-price">¥{{item.purchasePriceDisplay}}</view>
-                <view class="item-value-label">Value</view>
+                <view class="item-value-label">{{item.avgCostDisplay}}</view>
               </view>
             </view>
           </view>
@@ -199,7 +185,12 @@
               <view class="card-info">
                 <view class="card-name">{{item.name}}</view>
                 <view class="card-price">¥{{item.purchasePriceDisplay}}</view>
-                <view class="card-category">{{item.category}}</view>
+                <view class="card-avg-cost">{{item.avgCostDisplay}}</view>
+                <view class="card-meta">
+                  <text class="card-meta-category">{{item.category}}</text>
+                  <text class="card-meta-dot">·</text>
+                  <text class="card-meta-date">{{item.purchaseDateFormatted}}</text>
+                </view>
               </view>
             </view>
           </view>
@@ -245,82 +236,100 @@
 
     <!-- 抽屉头部 -->
     <view class="drawer-header">
-      <view class="drawer-edit-btn" bindtap="editItemFromDetail">编辑</view>
       <view class="drawer-title">物品详情</view>
-      <view class="drawer-close-btn" bindtap="closeDetailModal">
-        <text class="close-icon">×</text>
+      <view class="drawer-actions">
+        <view class="drawer-edit-btn" bindtap="editItemFromDetail">
+          <text class="edit-icon">✎</text>
+          <text class="edit-text">编辑</text>
+        </view>
+        <view class="drawer-close-btn" bindtap="closeDetailModal">
+          <text class="close-icon">×</text>
+        </view>
       </view>
     </view>
 
     <!-- 抽屉内容区域 -->
     <scroll-view class="drawer-content" scroll-y="true">
       <view wx:if="{{currentItemDetail}}" class="detail-content">
-        
+
         <!-- 主要展示区域 -->
         <view class="main-display">
-          <view class="main-icon-container">
+          <view class="main-icon-wrapper">
             <image src="{{currentItemDetail.iconPath}}" class="main-icon" mode="aspectFill" />
           </view>
-          <view class="main-name">{{currentItemDetail.name}}</view>
-          <view class="main-model">{{currentItemDetail.brand || '无品牌'}}</view>
-          <view class="main-tags">
-            <view class="tag-item category-tag">{{currentItemDetail.category}}</view>
-            <view wx:if="{{currentItemDetail.entityTypeLabel}}" class="tag-item type-tag">{{currentItemDetail.entityTypeLabel}}</view>
+          <view class="main-info">
+            <view class="main-name">{{currentItemDetail.name}}</view>
+            <view class="main-model">{{currentItemDetail.brand || '无品牌'}}</view>
+            <view class="main-tags">
+              <view class="tag-item category-tag">{{currentItemDetail.category}}</view>
+              <view wx:if="{{currentItemDetail.entityTypeLabel}}" class="tag-item type-tag">{{currentItemDetail.entityTypeLabel}}</view>
+            </view>
           </view>
         </view>
 
-        <!-- 快速统计网格 -->
-        <view class="stats-grid">
-          <view class="stats-item">
-            <view class="stats-label">购入价值</view>
-            <view class="stats-value">¥ {{currentItemDetail.purchasePriceDisplay}}</view>
-          </view>
-          <view class="stats-item">
-            <view class="stats-label">数量</view>
-            <view class="stats-value">{{currentItemDetail.quantity}}</view>
-          </view>
-          <view class="stats-item">
-            <view class="stats-label">购入日期</view>
-            <view class="stats-value">{{currentItemDetail.purchaseDateFormatted}}</view>
-          </view>
-          <view class="stats-item">
-            <view class="stats-label">物品状态</view>
-            <view class="stats-value">{{currentItemDetail.statusLabel}}</view>
-          </view>
-          <!-- 退役日期（条件显示） -->
-          <view wx:if="{{currentItemDetail.showRetireDate}}" class="stats-item">
-            <view class="stats-label">退役日期</view>
-            <view class="stats-value">{{currentItemDetail.retireDateFormatted || '未设置'}}</view>
-          </view>
-          <!-- 成本计算方式 -->
-          <view class="stats-item">
-            <view class="stats-label">成本计算</view>
-            <view class="stats-value">{{currentItemDetail.calculationMethodLabel}}</view>
-          </view>
-          <!-- 已使用次数（条件显示且可编辑） -->
-          <view wx:if="{{currentItemDetail.showUseTimes}}" class="stats-item stats-item-editable">
-            <view class="stats-label">已使用次数</view>
-            <view class="stats-value-with-controls">
-              <view class="usage-control" bindtap="decreaseUseTimes">
-                <text class="control-icon">-</text>
-              </view>
-              <view class="stats-value">{{currentItemDetail.useTimes || 1}}</view>
-              <view class="usage-control" bindtap="increaseUseTimes">
-                <text class="control-icon">+</text>
+        <!-- 快速属性列表 -->
+        <view class="stats-list">
+          <view class="stat-row">
+            <view class="stat-label">购入价值</view>
+            <view class="stat-value">
+              <text>¥ {{currentItemDetail.purchasePriceDisplay}}</text>
+              <view wx:if="{{currentItemDetail.quantity > 1}}" class="stat-value-sub">
+                单价 ¥{{currentItemDetail.purchasePriceUnitDisplay}} × {{currentItemDetail.quantity}}
               </view>
             </view>
           </view>
+          <view class="stat-row">
+            <view class="stat-label">数量</view>
+            <view class="stat-value">{{currentItemDetail.quantity}}</view>
+          </view>
+          <view class="stat-row">
+            <view class="stat-label">购入日期</view>
+            <view class="stat-value">{{currentItemDetail.purchaseDateFormatted}}</view>
+          </view>
+          <view class="stat-row">
+            <view class="stat-label">物品状态</view>
+            <view class="stat-value">{{currentItemDetail.statusLabel}}</view>
+          </view>
+          <!-- 退役日期（条件显示） -->
+          <view wx:if="{{currentItemDetail.showRetireDate}}" class="stat-row">
+            <view class="stat-label">退役日期</view>
+            <view class="stat-value">{{currentItemDetail.retireDateFormatted || '未设置'}}</view>
+          </view>
+          <!-- 成本计算方式 -->
+          <view class="stat-row">
+            <view class="stat-label">成本计算</view>
+            <view class="stat-value">{{currentItemDetail.calculationMethodLabel}}</view>
+          </view>
           <!-- 位置信息（条件显示） -->
-          <view wx:if="{{currentItemDetail.location}}" class="stats-item">
-            <view class="stats-label">位置</view>
-            <view class="stats-value">{{currentItemDetail.location}}</view>
+          <view wx:if="{{currentItemDetail.location}}" class="stat-row">
+            <view class="stat-label">位置</view>
+            <view class="stat-value">{{currentItemDetail.location}}</view>
+          </view>
+          <!-- 描述（横跨2列） -->
+          <view class="stat-row stat-row-full">
+            <view class="stat-label">描述</view>
+            <view class="stat-value stat-value-remarks">{{currentItemDetail.remarks || '无'}}</view>
+          </view>
+        </view>
+
+        <!-- 已使用次数（条件显示且可编辑） -->
+        <view wx:if="{{currentItemDetail.showUseTimes}}" class="usage-section">
+          <view class="usage-label">已使用次数</view>
+          <view class="usage-value-with-controls">
+            <view class="usage-control" bindtap="decreaseUseTimes">
+              <text class="control-icon">−</text>
+            </view>
+            <view class="usage-value">{{currentItemDetail.useTimes || 1}}</view>
+            <view class="usage-control" bindtap="increaseUseTimes">
+              <text class="control-icon">+</text>
+            </view>
           </view>
         </view>
 
         <!-- 关联物品区域 -->
         <view class="accessories-section">
           <view class="section-header">
-            <view class="section-title">关联服务与配件</view>
+            <text class="section-title">关联服务与配件</text>
             <view class="add-button" bindtap="addAssociatedItem">
               <text class="add-icon">+</text>
               <text class="add-text">添加</text>
@@ -354,14 +363,6 @@
           </view>
         </view>
 
-        <!-- 使用动机/备注 -->
-        <view wx:if="{{currentItemDetail.remarks}}" class="motivation-section">
-          <view class="section-title">备注信息</view>
-          <view class="motivation-content">
-            <text class="quote-icon">"</text>
-            <text class="motivation-text">{{currentItemDetail.remarks}}</text>
-          </view>
-        </view>
 
       </view>
     </scroll-view>

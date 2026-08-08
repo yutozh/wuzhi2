@@ -93,16 +93,16 @@ Page({
   searchTimer: null,
   // 生命周期
   async onReady() {
-    const [cardRes, swiperRes] = await Promise.all([
-      request("/home/cards").then((res) => res.data),
-      request("/home/swipers").then((res) => res.data),
-    ]);
+    // const [cardRes, swiperRes] = await Promise.all([
+    //   request("/home/cards").then((res) => res.data),
+    //   request("/home/swipers").then((res) => res.data),
+    // ]);
 
-    this.setData({
-      cardInfo: cardRes.data,
-      focusCardInfo: cardRes.data.slice(0, 3),
-      swiperList: swiperRes.data,
-    });
+    // this.setData({
+    //   cardInfo: cardRes.data,
+    //   focusCardInfo: cardRes.data.slice(0, 3),
+    //   swiperList: swiperRes.data,
+    // });
 
     // 加载图标数据
     this.loadIconData();
@@ -192,10 +192,10 @@ Page({
 
     try {
       // 并行加载轮播图和卡片数据
-      const [cardRes, swiperRes] = await Promise.all([
-        request("/home/cards").then((res) => res.data),
-        request("/home/swipers").then((res) => res.data),
-      ]);
+      // const [cardRes, swiperRes] = await Promise.all([
+      //   request("/home/cards").then((res) => res.data),
+      //   request("/home/swipers").then((res) => res.data),
+      // ]);
 
       // 重新从 ItemManager 加载物品数据
       if (this.itemManager) {
@@ -222,8 +222,8 @@ Page({
       setTimeout(() => {
         this.setData({
           enable: false,
-          cardInfo: cardRes.data,
-          swiperList: swiperRes.data,
+          // cardInfo: cardRes.data,
+          // swiperList: swiperRes.data,
         });
       }, 1000);
     } catch (error) {
@@ -279,16 +279,23 @@ Page({
       categoryColor: this.getCategoryColor(item.category),
       iconPath: this.getIconPath(item.icon), // 添加图标路径
       purchaseDateFormatted: this.formatDate(item.purchaseDate), // 格式化日期
+      purchasePriceDisplay: this.formatPriceWithCommas(
+        toPrice(item.purchasePrice * (parseFloat(item.quantity) || 1)),
+      ), // 列表显示总价（数量×单价）
+      avgCostDisplay: this.calcAvgCost(item), // 平均成本显示
     }));
 
     // 计算全部物品的统计信息（不受筛选影响）
     const totalCount = itemsWithColor.length;
     const totalValueInCents = itemsWithColor.reduce((sum, item) => {
+      const qty = parseFloat(item.quantity) || 1;
       const itemValue =
-        item.purchasePrice +
+        item.purchasePrice * qty +
         (item.associatedItems || []).reduce(
-          (assSum, assItem) => assSum + assItem.purchasePrice,
-          0
+          (assSum, assItem) =>
+            assSum +
+            assItem.purchasePrice * (parseFloat(assItem.quantity) || 1),
+          0,
         );
       return sum + itemValue;
     }, 0);
@@ -389,7 +396,7 @@ Page({
           // 按名称模糊搜索（不区分大小写）
           item.name.toLowerCase().includes(query) ||
           // 按品牌模糊搜索（不区分大小写）
-          (item.brand && item.brand.toLowerCase().includes(query))
+          (item.brand && item.brand.toLowerCase().includes(query)),
       );
     }
 
@@ -412,11 +419,14 @@ Page({
       // 数据量不大，直接显示全部
       const filteredCount = filtered.length;
       const filteredValueInCents = filtered.reduce((sum, item) => {
+        const qty = parseFloat(item.quantity) || 1;
         const itemValue =
-          item.purchasePrice +
+          item.purchasePrice * qty +
           (item.associatedItems || []).reduce(
-            (assSum, assItem) => assSum + assItem.purchasePrice,
-            0
+            (assSum, assItem) =>
+              assSum +
+              assItem.purchasePrice * (parseFloat(assItem.quantity) || 1),
+            0,
           );
         return sum + itemValue;
       }, 0);
@@ -457,11 +467,14 @@ Page({
     // 计算筛选后的统计信息（基于完整的筛选列表）
     const filteredCount = filtered.length;
     const filteredValueInCents = filtered.reduce((sum, item) => {
+      const qty = parseFloat(item.quantity) || 1;
       const itemValue =
-        item.purchasePrice +
+        item.purchasePrice * qty +
         (item.associatedItems || []).reduce(
-          (assSum, assItem) => assSum + assItem.purchasePrice,
-          0
+          (assSum, assItem) =>
+            assSum +
+            assItem.purchasePrice * (parseFloat(assItem.quantity) || 1),
+          0,
         );
       return sum + itemValue;
     }, 0);
@@ -563,6 +576,41 @@ Page({
 
     // 加载下一页
     this.loadPage(currentPage + 1);
+  },
+
+  // 计算物品平均成本
+  calcAvgCost(item) {
+    const totalCents = item.purchasePrice * (parseFloat(item.quantity) || 1);
+    const totalYuan = toPrice(totalCents);
+
+    if (item.averagePriceCalculationMethod === "BY_USAGE_COUNT") {
+      // 按使用次数
+      const useTimes = item.useTimes || 0;
+      if (useTimes <= 0) return "未使用";
+      const costPerUse = totalYuan / useTimes;
+      return this.formatCostNumber(costPerUse) + "元/次";
+    } else {
+      // 按天数（默认）
+      const purchaseDate = new Date(item.purchaseDate);
+      const endDate =
+        item.status !== "NORMAL" && item.retireDate
+          ? new Date(item.retireDate)
+          : new Date();
+      const days = Math.max(
+        1,
+        Math.ceil((endDate - purchaseDate) / (1000 * 60 * 60 * 24)),
+      );
+      const costPerDay = totalYuan / days;
+      return this.formatCostNumber(costPerDay) + "元/天";
+    }
+  },
+
+  // 格式化成本数字：<0.01 显示 "<0.01"，否则保留2位小数并去末尾零
+  formatCostNumber(num) {
+    if (num < 0.01) return "<0.01";
+    const s = num.toFixed(2);
+    // 去掉末尾多余的0（如 1.50→1.5，1.00→1）
+    return parseFloat(s).toString();
   },
 
   // 格式化价格，添加千位分隔符
@@ -899,9 +947,9 @@ Page({
         entityTypeIcon:
           entityTypeIcons[assItem.entityType || "PHYSICAL"] || "📦",
         purchasePriceDisplay: this.formatPriceWithCommas(
-          toPrice(assItem.purchasePrice)
+          toPrice(assItem.purchasePrice * (parseFloat(assItem.quantity) || 1)),
         ),
-      })
+      }),
     );
 
     return {
@@ -919,17 +967,21 @@ Page({
       associatedItemsCount: (item.associatedItems || []).length,
       associatedItems: formattedAssociatedItems,
       totalAssociatedValue: this.calculateAssociatedItemsValue(
-        item.associatedItems || []
+        item.associatedItems || [],
       ),
       useTimes: item.useTimes || 1, // 确保包含使用次数
+      purchasePriceUnitDisplay: this.formatPriceWithCommas(
+        toPrice(item.purchasePrice),
+      ), // 单价显示
     };
   },
 
   // 计算关联物品总价值
   calculateAssociatedItemsValue(associatedItems) {
     const totalCents = associatedItems.reduce(
-      (sum, item) => sum + item.purchasePrice,
-      0
+      (sum, item) =>
+        sum + item.purchasePrice * (parseFloat(item.quantity) || 1),
+      0,
     );
     return toPrice(totalCents);
   },

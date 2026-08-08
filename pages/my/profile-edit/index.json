@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "编辑个人信息",
+    "navigationBarBackgroundColor": "#f8f9ff",
+    "usingComponents": {
+        "t-toast": "tdesign-miniprogram/toast/toast"
+    }
+}

@@ -1,102 +1,470 @@
-.my {
-  height: calc(100vh - 56px);
-  overflow-y: auto;
+// ============================================
+// 马卡龙风格样式系统 - 清新蓝色主题
+// Macaron Color Palette - Fresh Blue Theme
+// ============================================
 
-  --td-navbar-bg-color: transparent;
-  .nav-bg {
-    width: 750rpx;
-    height: 200rpx;
-    position: fixed;
-    top: 0;
+// 清新蓝色马卡龙色系
+@blue-primary: #5b9bd5;
+@blue-secondary: #4a90e2;
+@blue-light: #87ceeb;
+@blue-pale: #b0e0e6;
+@blue-sky: #e0f7fa;
+@blue-fresh: #f0f8ff;
+
+// 配色辅助色
+@mint-green: #90ee90;
+@mint-pale: #f0fff0;
+@lavender: #dda0dd;
+@lavender-pale: #e6e6fa;
+@cream: #fffacd;
+@peach: #ffe4b5;
+
+.profile-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0f8ff 0%, #ffffff 50%, #e0f7fa 100%);
+  padding-bottom: calc(112rpx + env(safe-area-inset-bottom));
+}
+
+// ============================================
+// Header Section (头部区域)
+// ============================================
+
+.profile-header {
+  padding: 56rpx 40rpx 72rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-card {
+  position: relative;
+  width: 480rpx;
+  height: 360rpx;
+  background: linear-gradient(135deg, #b0e0e6 0%, #5b9bd5 100%);
+  border-radius: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow:
+    0 8rpx 24rpx rgba(91, 155, 213, 0.25),
+    0 4rpx 12rpx rgba(135, 206, 235, 0.2);
+  border: 3rpx solid #ffffff;
+}
+
+.avatar-image {
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4rpx 12rpx rgba(91, 155, 213, 0.3);
+  border: 4rpx solid #ffffff;
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 28rpx;
+  right: 28rpx;
+  width: 56rpx;
+  height: 56rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20rpx);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(91, 155, 213, 0.3);
+  border: 2rpx solid #b0e0e6;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.favorite-icon {
+  font-size: 32rpx;
+  color: #5b9bd5;
+}
+
+// ============================================
+// Content Section (内容区域)
+// ============================================
+
+.profile-content {
+  padding: 0 36rpx;
+}
+
+// ============================================
+// Info Card (个人信息卡片)
+// ============================================
+
+.info-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+  border-radius: 32rpx;
+  padding: 36rpx;
+  margin-bottom: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4rpx 12rpx rgba(91, 155, 213, 0.12);
+  border: 2rpx solid #b0e0e6;
+  transition: all 0.2s ease;
+}
+
+.info-card:active {
+  transform: scale(0.98);
+  background: linear-gradient(135deg, #b0e0e6 0%, #87ceeb 100%);
+}
+
+.info-card-content {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+}
+
+.info-icon-wrapper {
+  width: 88rpx;
+  height: 88rpx;
+  background: linear-gradient(135deg, #b0e0e6 0%, #5b9bd5 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(91, 155, 213, 0.2);
+}
+
+.info-icon {
+  --td-icon-size: 44rpx;
+  color: #ffffff;
+}
+
+.info-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.info-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.vip-badge-img {
+  width: 44rpx;
+  height: 44rpx;
+  margin-right: 6rpx;
+  animation: vipGlow 2s ease-in-out infinite;
+}
+
+@keyframes vipGlow {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4rpx rgba(255, 215, 0, 0.5));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 8rpx rgba(255, 215, 0, 0.8));
+  }
+}
+
+.info-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: all 0.3s ease;
+  color: #4a4a4a;
+}
+
+.info-id {
+  font-size: 22rpx;
+  color: #a0a0a0;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.info-hint {
+  font-size: 22rpx;
+  color: #5a7a9a;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.chevron-icon {
+  --td-icon-size: 44rpx;
+  color: #87ceeb;
+}
+
+// ============================================
+// Menu Card (功能菜单卡片)
+// ============================================
+
+.menu-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+  border-radius: 32rpx;
+  margin-bottom: 28rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(91, 155, 213, 0.12);
+  border: 2rpx solid #b0e0e6;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36rpx;
+  transition: all 0.2s ease;
+}
+
+.menu-item:active {
+  background: linear-gradient(135deg, #b0e0e6 0%, #87ceeb 100%);
+}
+
+.menu-item-border {
+  border-bottom: 1.5rpx solid #b0e0e6;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+}
+
+.menu-icon {
+  font-size: 44rpx;
+  color: #87ceeb;
+}
+
+.menu-label {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.menu-item-highlight {
+  background: linear-gradient(135deg, #fffacd 0%, #ffe4b5 100%);
+}
+
+.menu-icon-highlight {
+  color: #ff8c00 !important;
+}
+
+.menu-label-highlight {
+  color: #ff8c00 !important;
+  font-weight: 700 !important;
+}
+
+// ============================================
+// Stats Grid (统计卡片)
+// ============================================
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin-bottom: 56rpx;
+}
+
+.stat-card {
+  padding: 32rpx;
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 12rpx rgba(91, 155, 213, 0.12);
+  border: 2rpx solid #b0e0e6;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:active {
+  transform: scale(0.98);
+}
+
+.stat-card-primary {
+  background: linear-gradient(135deg, #e6e6fa 0%, #dda0dd 100%);
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, #f0fff0 0%, #90ee90 100%);
+}
+
+.stat-label {
+  font-size: 18rpx;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6rpx;
+  line-height: 1.2;
+}
+
+.stat-card-primary .stat-label {
+  color: #9370db;
+}
+
+.stat-card-success .stat-label {
+  color: #32cd32;
+}
+
+.stat-value {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #4a4a4a;
+  text-shadow: 0 1rpx 2rpx rgba(255, 255, 255, 0.5);
+}
+
+// ============================================
+// Version Info (版本信息)
+// ============================================
+
+.version-info {
+  text-align: center;
+  padding: 28rpx 0;
+}
+
+.version-text {
+  font-size: 18rpx;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #87ceeb;
+}
+
+// ============================================
+// Material Icons Support
+// ============================================
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga";
+}
+
+// ============================================
+// 响应式适配
+// ============================================
+
+@media (max-width: 375px) {
+  .profile-header {
+    padding: 48rpx 32rpx 64rpx;
   }
 
-  &-info,
-  &-service,
-  &-setting {
-    background-color: #fff;
+  .avatar-card {
+    width: 420rpx;
+    height: 320rpx;
+    border-radius: 48rpx;
   }
 
-  &-info {
+  .avatar-image {
+    width: 240rpx;
+    height: 240rpx;
+  }
+
+  .avatar-badge {
+    width: 48rpx;
+    height: 48rpx;
+    bottom: 24rpx;
+    right: 24rpx;
+  }
+
+  .favorite-icon {
+    font-size: 28rpx;
+  }
+
+  .profile-content {
+    padding: 0 28rpx;
+  }
+
+  .info-card {
+    padding: 32rpx;
+    border-radius: 28rpx;
+    margin-bottom: 24rpx;
+  }
+
+  .info-icon-wrapper {
+    width: 80rpx;
+    height: 80rpx;
+  }
+
+  .info-icon {
+    --td-icon-size: 40rpx;
+  }
+
+  .info-name {
+    font-size: 32rpx;
+  }
+
+  .info-id {
+    font-size: 20rpx;
+  }
+
+  .info-hint {
+    font-size: 20rpx;
+  }
+
+  .chevron-icon {
+    --td-icon-size: 40rpx;
+  }
+
+  .menu-card {
+    border-radius: 28rpx;
+    margin-bottom: 24rpx;
+  }
+
+  .menu-item {
+    padding: 32rpx;
+  }
+
+  .menu-icon {
+    font-size: 40rpx;
+  }
+
+  .menu-label {
+    font-size: 28rpx;
+  }
+
+  .stats-grid {
+    gap: 16rpx;
+    margin-bottom: 48rpx;
+  }
+
+  .stat-card {
+    padding: 28rpx;
     border-radius: 24rpx;
-    margin: 8rpx 32rpx 0rpx 32rpx;
-    padding-bottom: 32rpx;
-    overflow: hidden;
-
-    .cell-class-title {
-      font-weight: 600 !important;
-    }
-
-    .cell-class-center {
-      display: flex;
-      align-items: center !important;
-    }
-
-    .divider-class {
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    .grid-class {
-      margin-top: 40rpx;
-    }
-
-    .grid-item .t-grid-item__content {
-      padding: 0px !important;
-    }
-
-    .split-line {
-      border-right: 1px solid #e7e7e7;
-    }
-
-    // 头像margin-right
-    --td-spacer-1: 32rpx;
-
-    &__person {
-      .name {
-        line-height: 48rpx;
-        font-size: 32rpx;
-        color: #000000e6;
-        font-weight: 600;
-      }
-
-      .tags {
-        display: flex;
-        margin-top: 16rpx;
-
-        --td-text-color-primary: #000000e6;
-        --td-tag-medium-font-size: 20rpx;
-        --td-tag-medium-icon-size: 24rpx;
-      }
-
-      .tag:not(:last-child) {
-        margin-right: 16rpx;
-      }
-    }
   }
 
-  &-service {
-    border-radius: 24rpx;
-    margin: 32rpx;
-    padding-bottom: 8rpx;
-    overflow: hidden;
+  .stat-value {
+    font-size: 40rpx;
+  }
 
-    &__list-item {
-      .t-grid-item__content {
-        padding-bottom: 16rpx !important;
-      }
-      .t-grid-item__text {
-        height: 40rpx !important;
-      }
-    }
+  .stat-label {
+    font-size: 16rpx;
+  }
 
-    &--tips {
-      height: 44rpx;
-      line-height: 44rpx;
-      padding-left: 40rpx;
-      margin-top: 32rpx;
-      color: #000000e6;
-      font-size: 28rpx;
-      font-weight: 600;
-    }
+  .version-text {
+    font-size: 16rpx;
   }
 }

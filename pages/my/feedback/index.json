@@ -1,0 +1,8 @@
+{
+    "navigationBarTitleText": "意见反馈",
+    "navigationBarBackgroundColor": "#f8f9ff",
+    "usingComponents": {
+        "t-toast": "tdesign-miniprogram/toast/toast",
+        "t-textarea": "tdesign-miniprogram/textarea/textarea"
+    }
+}

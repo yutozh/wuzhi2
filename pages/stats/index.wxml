@@ -2,7 +2,6 @@
   <!-- 头部标题 -->
   <view class="header">
     <text class="title">数据统计</text>
-    <text class="subtitle">记录你的资产成长轨迹</text>
   </view>
 
   <!-- 统计卡片 -->
@@ -17,7 +16,7 @@
     </view>
     <view class="card card-blue">
       <text class="card-label">记录天数</text>
-      <text class="card-value">{{recordingDays}}<text class="unit">d</text></text>
+      <text class="card-value">{{recordingDays}}<text class="unit">天</text></text>
     </view>
   </view>
 

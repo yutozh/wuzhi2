@@ -1,0 +1,9 @@
+{
+    "navigationBarTitleText": "应用设置",
+    "navigationBarBackgroundColor": "#f8f9ff",
+    "usingComponents": {
+        "t-toast": "tdesign-miniprogram/toast/toast",
+        "t-switch": "tdesign-miniprogram/switch/switch",
+        "t-action-sheet": "tdesign-miniprogram/action-sheet/action-sheet"
+    }
+}

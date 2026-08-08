@@ -1,5 +1,12 @@
 <t-navbar title="{{title}}" left-arrow />
 
+<!-- 选择器遮罩层 -->
+<view 
+  wx:if="{{statusVisible || categoryVisible || purchaseDateVisible || retireDateVisible}}"
+  class="picker-overlay"
+  catchtap="hideAllPickers"
+></view>
+
 <view class="release-container">  
   <view class="info-edit box">
     <!-- 实体类型（仅主物品显示） -->
@@ -59,18 +66,23 @@
     <!-- 退役日期 -->
     <t-cell arrow wx:if="{{selectedStatusLabel !== '使用中'}}" bind:click="showPicker" data-mode="retireDate" note="{{formData.retireDate || '请选择退役日期'}}" title="退役日期" />
 
-    <!-- 价格 -->
-    <t-cell class="info-edit__cell" title="价格">
-      <t-input bind:change="onPurchasePriceInput" borderless placeholder="0.00" tips="{{priceError ? '请输入正确的价格' : ''}}"
-         slot="note" suffix="元" align="right" type="number" format="{{priceFormat}}" t-class-tips="tips" value="{{formData.purchasePrice}}"
-      />
-    </t-cell>
-
     <!-- 数量 -->
     <t-cell class="info-edit__cell" title="数量">
       <t-input bind:change="onQuantityInput" borderless placeholder="填写数量" tips="{{quantityError ? '请输入正确的数量' : ''}}"
          slot="note"  align="right" type="number" t-class-tips="tips" value="{{formData.quantity}}"
       />
+    </t-cell>
+
+    <!-- 价格/单价 -->
+    <t-cell class="info-edit__cell" title="{{quantityNotOne ? '单价' : '价格'}}">
+      <view slot="note" class="price-input-wrapper">
+        <t-input bind:change="onPurchasePriceInput" borderless placeholder="0.00" tips="{{priceError ? '请输入正确的价格' : ''}}"
+           suffix="元" align="right" type="number" format="{{priceFormat}}" t-class-tips="tips" value="{{formData.purchasePrice}}"
+        />
+        <view wx:if="{{quantityNotOne && totalPriceDisplay}}" class="total-price-hint">
+          <text>合计：¥{{totalPriceDisplay}}</text>
+        </view>
+      </view>
     </t-cell>
 
     <!-- 成本计算方式（仅主物品显示） -->
@@ -100,7 +112,7 @@
           t-class-textarea="placeholder-class"
           placeholder="请输入描述（可选）"
           disableDefaultPadding="{{true}}"
-          bindinput="onRemarksInput"
+          bind:change="onRemarksInput"
           slot="note"
         />
     </view>
@@ -123,7 +135,7 @@
   confirmBtn="确认"
   data-mode="status"
   mode="status"
-  title="选择物品类别"
+  title="选择物品状态"
   value="{{formData.status}}"
   visible="{{statusVisible}}"
 >
@@ -139,7 +151,7 @@
   confirmBtn="确认"
   data-mode="category"
   mode="category"
-  title="选择物品状态"
+  title="选择物品类别"
   value="{{formData.category}}"
   visible="{{categoryVisible}}"
 >
@@ -206,3 +218,19 @@
     </t-tab-panel>
   </t-tabs>
 </t-popup>
+
+<!-- 未登录提示弹窗 -->
+<view wx:if="{{showLoginModal}}" class="login-modal-overlay" catchtap="onCloseLoginModal">
+  <view class="login-modal" catchtap="stopPropagation">
+    <view class="login-modal-icon">⚠️</view>
+    <view class="login-modal-title">数据仅保存在本地</view>
+    <view class="login-modal-desc">
+      未登录状态下，数据保存在本机缓存中。
+      如果清理微信缓存或更换设备，数据将无法找回。
+    </view>
+    <view class="login-modal-actions">
+      <button class="modal-btn modal-btn-secondary" bindtap="onContinueWithoutLogin">继续（不登录）</button>
+      <button class="modal-btn modal-btn-primary" bindtap="onGoLogin">去登录</button>
+    </view>
+  </view>
+</view>

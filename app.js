@@ -49,6 +49,16 @@ if (config.isMock) {
 
 App({
   onLaunch() {
+    // 预加载 Material Icons 字体，避免页面渲染时出现字体闪烁
+    wx.loadFontFace({
+      family: "Material Icons",
+      source:
+        "url('https://fonts.gstatic.com/s/materialicons/v140/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2')",
+      scopes: ["webview"],
+      success: () => console.log("Material Icons 字体加载成功"),
+      fail: (err) => console.warn("Material Icons 字体加载失败:", err),
+    });
+
     const updateManager = wx.getUpdateManager();
 
     updateManager.onCheckForUpdate((res) => {

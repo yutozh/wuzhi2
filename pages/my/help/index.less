@@ -1,0 +1,142 @@
+.help-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 48rpx);
+}
+
+.page-header {
+  padding: 48rpx 40rpx 32rpx;
+}
+
+.header-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #8e8e93;
+}
+
+.qa-list {
+  padding: 0 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.qa-item {
+  background: #ffffff;
+  border-radius: 24rpx;
+  border: 2rpx solid #e5e5ea;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.qa-item-expanded {
+  border-color: #b0d4ff;
+}
+
+.qa-question {
+  display: flex;
+  align-items: flex-start;
+  padding: 32rpx;
+  gap: 20rpx;
+}
+
+.q-label {
+  width: 40rpx;
+  height: 40rpx;
+  background: #1c1c1e;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+.q-text {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+  line-height: 1.5;
+}
+
+.q-arrow {
+  font-size: 36rpx;
+  color: #8e8e93;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.q-arrow-up {
+  transform: rotate(180deg);
+}
+
+.qa-answer {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 32rpx 32rpx;
+  gap: 20rpx;
+  border-top: 1rpx solid #f2f2f7;
+  padding-top: 24rpx;
+}
+
+.a-label {
+  width: 40rpx;
+  height: 40rpx;
+  background: #e8f4ff;
+  color: #0a7aff;
+  border-radius: 50%;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+.a-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #3c3c43;
+  line-height: 1.7;
+}
+
+.help-footer {
+  margin: 48rpx 40rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.footer-text {
+  font-size: 28rpx;
+  color: #8e8e93;
+}
+
+.footer-link {
+  padding: 8rpx 24rpx;
+  background: #1c1c1e;
+  border-radius: 999rpx;
+}
+
+.footer-link-text {
+  font-size: 28rpx;
+  color: #ffffff;
+  font-weight: 600;
+}

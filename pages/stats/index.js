@@ -293,7 +293,10 @@ Page({
 
     // 总价值（分转元）
     const totalValue = centsToYuan(
-      filteredItems.reduce((sum, item) => sum + (item.purchasePrice || 0), 0),
+      filteredItems.reduce((sum, item) => {
+        const qty = parseFloat(item.quantity) || 1;
+        return sum + (item.purchasePrice || 0) * qty;
+      }, 0),
     );
 
     // 本月新增
@@ -383,8 +386,9 @@ Page({
       items.forEach((item) => {
         const year = new Date(item.purchaseDate).getFullYear();
         if (timeData[year]) {
+          const qty = parseFloat(item.quantity) || 1;
           timeData[year].count++;
-          timeData[year].value += centsToYuan(item.purchasePrice || 0);
+          timeData[year].value += centsToYuan((item.purchasePrice || 0) * qty);
         }
       });
     } else {
@@ -412,8 +416,9 @@ Page({
           date.getMonth() + 1,
         ).padStart(2, "0")}`;
         if (timeData[key]) {
+          const qty = parseFloat(item.quantity) || 1;
           timeData[key].count++;
-          timeData[key].value += centsToYuan(item.purchasePrice || 0);
+          timeData[key].value += centsToYuan((item.purchasePrice || 0) * qty);
         }
       });
     }
@@ -446,8 +451,9 @@ Page({
 
       sortedItems.forEach((item) => {
         const year = new Date(item.purchaseDate).getFullYear();
+        const qty = parseFloat(item.quantity) || 1;
         cumulativeCount++;
-        cumulativeValue += centsToYuan(item.purchasePrice || 0);
+        cumulativeValue += centsToYuan((item.purchasePrice || 0) * qty);
 
         // 更新该年及之后所有年份的累计值
         for (let y = year; y <= this.data.endYear; y++) {
@@ -481,8 +487,9 @@ Page({
         const itemKey = `${date.getFullYear()}-${String(
           date.getMonth() + 1,
         ).padStart(2, "0")}`;
+        const qty = parseFloat(item.quantity) || 1;
         cumulativeCount++;
-        cumulativeValue += centsToYuan(item.purchasePrice || 0);
+        cumulativeValue += centsToYuan((item.purchasePrice || 0) * qty);
 
         // 更新该月及之后所有月份的累计值
         let updateFlag = false;
@@ -506,7 +513,10 @@ Page({
     const categoryStats = {};
     const totalCount = items.length;
     const totalValue = centsToYuan(
-      items.reduce((sum, item) => sum + (item.purchasePrice || 0), 0),
+      items.reduce((sum, item) => {
+        const qty = parseFloat(item.quantity) || 1;
+        return sum + (item.purchasePrice || 0) * qty;
+      }, 0),
     );
 
     // 统计各分类
@@ -515,8 +525,11 @@ Page({
       if (!categoryStats[category]) {
         categoryStats[category] = { count: 0, value: 0 };
       }
+      const qty = parseFloat(item.quantity) || 1;
       categoryStats[category].count++;
-      categoryStats[category].value += centsToYuan(item.purchasePrice || 0);
+      categoryStats[category].value += centsToYuan(
+        (item.purchasePrice || 0) * qty,
+      );
     });
 
     // 转换为百分比并添加颜色

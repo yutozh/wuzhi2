@@ -1,0 +1,164 @@
+.settings-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+.page-header {
+  padding: 48rpx 40rpx 32rpx;
+}
+
+.header-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+  margin-bottom: 8rpx;
+}
+
+.header-subtitle {
+  display: block;
+  font-size: 28rpx;
+  color: #8e8e93;
+}
+
+.page-content {
+  padding: 0 40rpx;
+}
+
+// 功能区块
+.section-card {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f2f2f7;
+}
+
+.section-icon {
+  font-size: 48rpx;
+  color: #1c1c1e;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1c1c1e;
+}
+
+.setting-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 16rpx;
+  border-bottom: 1rpx solid #f2f2f7;
+  transition: background 0.2s ease;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item:active {
+  background: #f8fafc;
+  border-radius: 16rpx;
+}
+
+.setting-content {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  flex: 1;
+}
+
+.setting-icon {
+  font-size: 48rpx;
+  color: #8e8e93;
+}
+
+.setting-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.setting-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1c1c1e;
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: #aeaeb2;
+}
+
+.chevron-icon {
+  font-size: 48rpx;
+  color: #d1d1d6;
+}
+
+// 版权信息
+.copyright {
+  text-align: center;
+  padding: 48rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.copyright-text {
+  font-size: 24rpx;
+  color: #aeaeb2;
+  line-height: 1.5;
+}
+
+// 退出登录按钮
+.logout-btn {
+  margin: 0 0 48rpx;
+  height: 96rpx;
+  background: #fff1f0;
+  border-radius: 24rpx;
+  border: 2rpx solid #ffccc7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #ff3b30;
+  }
+}
+
+.logout-btn:active {
+  opacity: 0.75;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}

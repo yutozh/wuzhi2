@@ -1,0 +1,266 @@
+.profile-edit-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+.edit-header {
+  padding: 64rpx 48rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+// 头像选择按钮（使用 button open-type="chooseAvatar"）
+.avatar-section {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-section::after {
+  border: none;
+}
+
+.avatar-hint {
+  font-size: 24rpx;
+  color: #8e8e93;
+}
+
+.avatar-preview {
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+  border: 4rpx solid #ffffff;
+}
+
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 72rpx;
+  height: 72rpx;
+  background: #1c1c1e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  border: 4rpx solid #ffffff;
+  transition: all 0.2s ease;
+}
+
+.avatar-edit-btn:active {
+  transform: scale(0.95);
+  background: #2c2c2e;
+}
+
+.avatar-edit-btn .material-icons {
+  font-size: 36rpx;
+  color: #ffffff;
+}
+
+.edit-content {
+  padding: 0 40rpx;
+}
+
+// 微信授权区域
+.wechat-section {
+  margin-bottom: 32rpx;
+}
+
+.wechat-btn {
+  width: 100%;
+  height: 112rpx;
+  background: #07c160;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(7, 193, 96, 0.3);
+  border: none;
+  transition: all 0.2s ease;
+  margin-bottom: 24rpx;
+}
+
+.wechat-btn::after {
+  border: none;
+}
+
+.wechat-btn:active {
+  background: #06ad56;
+  transform: scale(0.98);
+}
+
+.wechat-icon {
+  font-size: 48rpx;
+  color: #ffffff;
+}
+
+.wechat-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.divider-text {
+  text-align: center;
+  font-size: 24rpx;
+  color: #8e8e93;
+  position: relative;
+  margin: 32rpx 0;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1rpx;
+  background: #e5e5ea;
+}
+
+.divider-text::before {
+  left: 0;
+}
+
+.divider-text::after {
+  right: 0;
+}
+
+.form-section {
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 16rpx 0;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  border: 2rpx solid #e5e5ea;
+}
+
+.form-item {
+  padding: 32rpx 40rpx;
+  border-bottom: 1rpx solid #f2f2f7;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 24rpx;
+  color: #8e8e93;
+  margin-bottom: 12rpx;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.form-input {
+  font-size: 32rpx;
+  color: #1c1c1e;
+  font-weight: 600;
+}
+
+.form-value-readonly {
+  font-size: 32rpx;
+  color: #aeaeb2;
+  font-weight: 500;
+}
+
+// 性别选择器
+.gender-options {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 4rpx;
+}
+
+.gender-option {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #e5e5ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #8e8e93;
+  background: #f9f9f9;
+  transition: all 0.15s ease;
+}
+
+.gender-option:active {
+  opacity: 0.7;
+}
+
+.gender-option-active {
+  border-color: #1c1c1e;
+  background: #1c1c1e;
+  color: #ffffff;
+}
+
+.action-section {
+  margin-top: 32rpx;
+}
+
+.save-btn {
+  width: 100%;
+  height: 112rpx;
+  background: #1c1c1e;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.save-btn::after {
+  border: none;
+}
+
+.save-btn:active {
+  background: #2c2c2e;
+  transform: scale(0.98);
+}
+
+.save-btn[disabled] {
+  opacity: 0.6;
+}
+
+.btn-icon {
+  font-size: 48rpx;
+  color: #ffffff;
+}
+
+.btn-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}

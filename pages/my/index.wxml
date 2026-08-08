@@ -1,75 +1,70 @@
 <t-toast id="t-toast" />
 
-<view class="my">
-  <image class="nav-bg" src="/static/bg_navbar.png" />
-  <nav title-text="我的" />
-  <view class="my-info">
-    <t-cell-group>
-      <t-cell wx:if="{{isLoad}}" bordered="{{false}}">
-        <t-avatar image="{{personalInfo.image}}" slot="left-icon" size="large" />
-        <view class="my-info__person" slot="description">
-          <view class="name">{{personalInfo.name}}</view>
-          <view class="tags">
-            <t-tag class="tag" variant="light" icon="discount">{{personalInfo.star}}</t-tag>
-            <t-tag class="tag" variant="light" icon="location">{{personalInfo.city}}</t-tag>
-          </view>
+<view class="profile-page">
+  <!-- 内容区域 -->
+  <view class="profile-content">
+    <!-- 个人信息卡片 -->
+    <view class="info-card" bindtap="onEditProfile">
+      <view class="info-card-content">
+        <view class="info-icon-wrapper {{isLoggedIn ? 'has-avatar' : ''}}">
+          <image 
+            wx:if="{{isLoggedIn && userInfo.avatar}}"
+            class="info-avatar" 
+            src="{{userInfo.avatar}}" 
+            mode="aspectFill"
+          />
+          <t-icon wx:else name="user" class="info-icon" />
         </view>
-        <t-icon slot="right-icon" name="edit" size="40rpx" color="#000000e6" bindtap="onNavigateTo" />
-      </t-cell>
-      <t-cell
-        wx:if="{{!isLoad}}"
-        title="请先登录/注册"
-        bordered="{{false}}"
-        t-class-title="cell-class-title"
-        t-class-center="cell-class-center"
-        bindtap="onLogin"
-      >
-        <t-avatar slot="left-icon" icon="user" size="128rpx" />
-      </t-cell>
-    </t-cell-group>
-    <t-divider t-class="divider-class" />
-    <t-grid t-class="grid-class">
-      <t-grid-item
-        wx:for="{{gridList}}"
-        wx:for-item="gridItem"
+        <view class="info-text">
+          <view class="info-name-row">
+            <image 
+              wx:if="{{vipConfig[userInfo.vipLevel].showBadge}}" 
+              class="vip-badge-img" 
+              src="{{vipConfig[userInfo.vipLevel].badge}}" 
+              mode="aspectFit"
+            />
+            <text class="info-name" style="color: {{vipConfig[userInfo.vipLevel].color}}">{{userInfo.name}}</text>
+          </view>
+          <view class="info-id" wx:if="{{isLoggedIn && userInfo.id}}">ID: {{userInfo.id}}</view>
+          <view class="info-hint" wx:if="{{!isLoggedIn}}">点击设置个人信息</view>
+        </view>
+      </view>
+      <t-icon name="chevron-right" class="chevron-icon" />
+    </view>
+
+    <!-- 功能菜单卡片 -->
+    <view class="menu-card">
+      <view 
+        wx:for="{{menuList}}" 
         wx:key="type"
-        text="{{gridItem.name}}"
-        icon="{{gridItem.icon}}"
-        class="grid-item {{gridItem.type === 'all' ? 'split-line' : ''}}"
-        data-data="{{gridItem}}"
-        bindclick="onEleClick"
-      />
-    </t-grid>
-  </view>
+        class="menu-item {{index < menuList.length - 1 ? 'menu-item-border' : ''}} {{item.highlight ? 'menu-item-highlight' : ''}}"
+        bindtap="onMenuClick"
+        data-type="{{item.type}}"
+        data-url="{{item.url}}"
+      >
+        <view class="menu-item-content">
+          <text class="material-icons menu-icon {{item.highlight ? 'menu-icon-highlight' : ''}}">{{item.icon}}</text>
+          <text class="menu-label {{item.highlight ? 'menu-label-highlight' : ''}}">{{item.label}}</text>
+        </view>
+        <t-icon name="chevron-right" class="chevron-icon" />
+      </view>
+    </view>
 
-  <view class="my-service">
-    <view class="my-service--tips">推荐服务</view>
-    <t-grid column="{{4}}" class="my-service__list">
-      <t-grid-item
-        class="my-service__list-item"
-        wx:for="{{service}}"
-        wx:key="item"
-        text="{{item.name}}"
-        image="{{item.image}}"
-        url="{{item.url}}"
-        data-data="{{item}}"
-        bindclick="onEleClick"
-      />
-    </t-grid>
-  </view>
+    <!-- 统计卡片 -->
+    <!-- <view class="stats-grid">
+      <view class="stat-card stat-card-primary">
+        <view class="stat-label">Total Value</view>
+        <view class="stat-value">¥{{totalValueDisplay}}</view>
+      </view>
+      <view class="stat-card stat-card-success">
+        <view class="stat-label">Total Items</view>
+        <view class="stat-value">{{totalItems}}</view>
+      </view>
+    </view> -->
 
-  <t-cell-group theme="card">
-    <t-cell
-      wx:for="{{settingList}}"
-      wx:for-item="item"
-      wx:key="type"
-      title="{{item.name}}"
-      url="{{item.url}}"
-      leftIcon="{{item.icon}}"
-      hover
-      arrow
-      data-data="{{item}}"
-      bindclick="onEleClick"
-    />
-  </t-cell-group>
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <text class="version-text">Since 2026 • Made by Yuto</text>
+    </view>
+  </view>
 </view>

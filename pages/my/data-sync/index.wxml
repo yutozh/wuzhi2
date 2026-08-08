@@ -1,0 +1,236 @@
+<t-toast id="t-toast" />
+
+<view class="data-sync-page">
+  <view class="page-header">
+    <text class="header-title">数据同步与导出</text>
+    <text class="header-subtitle">管理您的物品数据</text>
+  </view>
+
+  <view class="page-content">
+    <!-- 数据统计卡片 -->
+    <view class="stats-card">
+      <view class="stats-item">
+        <text class="material-icons stats-icon">inventory_2</text>
+        <view class="stats-info">
+          <text class="stats-value">{{totalItems}}</text>
+          <text class="stats-label">本地物品</text>
+        </view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <text class="material-icons stats-icon">category</text>
+        <view class="stats-info">
+          <text class="stats-value">{{totalCategories}}</text>
+          <text class="stats-label">本地分类</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 云端同步 -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="material-icons section-icon">cloud_sync</text>
+        <text class="section-title">云端同步</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item {{isSyncing ? 'action-item-disabled' : ''}}" bindtap="onUploadData">
+          <view class="action-content">
+            <view class="action-icon-wrap action-icon-wrap-upload">
+              <text class="material-icons action-icon">cloud_upload</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title">上传到云端</text>
+              <text class="action-desc">将本地数据备份到您的账号</text>
+            </view>
+          </view>
+          <view wx:if="{{isSyncing}}" class="loading-indicator">
+            <text class="loading-dot"></text>
+          </view>
+          <text wx:else class="material-icons chevron-icon">chevron_right</text>
+        </view>
+
+        <view class="action-item {{isDownloading ? 'action-item-disabled' : ''}}" bindtap="onDownloadData">
+          <view class="action-content">
+            <view class="action-icon-wrap action-icon-wrap-download">
+              <text class="material-icons action-icon">cloud_download</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title">从云端下载</text>
+              <text class="action-desc">将云端数据恢复到本机</text>
+            </view>
+          </view>
+          <view wx:if="{{isDownloading}}" class="loading-indicator">
+            <text class="loading-text">获取中...</text>
+          </view>
+          <text wx:else class="material-icons chevron-icon">chevron_right</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 本地导出 -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="material-icons section-icon">file_download</text>
+        <text class="section-title">本地导出</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item" bindtap="onExportJSON">
+          <view class="action-content">
+            <view class="action-icon-wrap">
+              <text class="material-icons action-icon">code</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title">导出为 JSON</text>
+              <text class="action-desc">完整的数据备份文件</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+
+        <view class="action-item" bindtap="onExportExcel">
+          <view class="action-content">
+            <view class="action-icon-wrap">
+              <text class="material-icons action-icon">table_chart</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title">导出为 Excel</text>
+              <text class="action-desc">表格格式，便于查看</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 本地导入 -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="material-icons section-icon">file_upload</text>
+        <text class="section-title">本地导入</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item" bindtap="onImportData">
+          <view class="action-content">
+            <view class="action-icon-wrap">
+              <text class="material-icons action-icon">upload_file</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title">从文件导入</text>
+              <text class="action-desc">恢复之前导出的备份文件</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 危险操作 -->
+    <view class="section-card danger-section">
+      <view class="section-header">
+        <text class="material-icons section-icon danger-icon">warning</text>
+        <text class="section-title danger-title">危险操作</text>
+      </view>
+
+      <view class="action-list">
+        <view class="action-item" bindtap="onClearAllData">
+          <view class="action-content">
+            <view class="action-icon-wrap action-icon-wrap-danger">
+              <text class="material-icons action-icon">delete_forever</text>
+            </view>
+            <view class="action-text">
+              <text class="action-title danger-title">清空所有数据</text>
+              <text class="action-desc">此操作不可恢复，请谨慎</text>
+            </view>
+          </view>
+          <text class="material-icons chevron-icon">chevron_right</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 清空确认对话框 -->
+<t-dialog
+  visible="{{showDialog}}"
+  title="{{dialogTitle}}"
+  content="{{dialogContent}}"
+  confirm-btn="确认"
+  cancel-btn="取消"
+  bind:confirm="onDialogConfirm"
+  bind:cancel="onDialogCancel"
+/>
+
+<!-- 下载确认弹窗 -->
+<view wx:if="{{showDownloadConfirm}}" class="confirm-overlay" bindtap="onCancelDownload">
+  <view class="confirm-sheet" catchtap="stopPropagation">
+    <view class="confirm-handle"><view class="handle-bar"></view></view>
+
+    <view class="confirm-header">
+      <text class="confirm-title">确认覆盖本地数据？</text>
+      <text class="confirm-subtitle">请核对以下信息后再决定</text>
+    </view>
+
+    <!-- 云端数据摘要 -->
+    <view class="summary-block">
+      <view class="summary-block-title">
+        <text class="material-icons summary-icon">cloud</text>
+        <text>云端数据</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">物品数量</text>
+        <text class="summary-value">{{remoteSummary.itemCount}} 件</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">分类数量</text>
+        <text class="summary-value">{{remoteSummary.categoryCount}} 个</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">最后更新</text>
+        <text class="summary-value">{{remoteSummary.updatedAt}}</text>
+      </view>
+    </view>
+
+    <!-- 与本地的差异 -->
+    <view class="diff-block">
+      <view class="summary-block-title">
+        <text class="material-icons summary-icon">compare_arrows</text>
+        <text>与本地差异</text>
+      </view>
+      <view wx:if="{{remoteSummary.noChange}}" class="diff-no-change">
+        <text class="material-icons">check_circle</text>
+        <text>与本地数据完全一致，无需覆盖</text>
+      </view>
+      <view wx:else class="diff-rows">
+        <view class="diff-row diff-row-add" wx:if="{{remoteSummary.addedCount > 0}}">
+          <text class="material-icons diff-icon">add_circle</text>
+          <text class="diff-text">新增 {{remoteSummary.addedCount}} 件物品</text>
+        </view>
+        <view class="diff-row diff-row-remove" wx:if="{{remoteSummary.removedCount > 0}}">
+          <text class="material-icons diff-icon">remove_circle</text>
+          <text class="diff-text">减少 {{remoteSummary.removedCount}} 件物品</text>
+        </view>
+        <view class="diff-row diff-row-update" wx:if="{{remoteSummary.updatedCount > 0}}">
+          <text class="material-icons diff-icon">update</text>
+          <text class="diff-text">更新 {{remoteSummary.updatedCount}} 件物品</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="confirm-warning">
+      <text class="material-icons warning-icon">info</text>
+      <text class="warning-text">覆盖后本地当前数据将被替换，此操作不可撤销</text>
+    </view>
+
+    <view class="confirm-actions">
+      <button class="confirm-btn-cancel" bindtap="onCancelDownload">取消</button>
+      <button
+        class="confirm-btn-ok {{remoteSummary.noChange ? 'confirm-btn-ok-disabled' : ''}}"
+        bindtap="onConfirmDownload"
+        disabled="{{remoteSummary.noChange}}"
+      >覆盖本地数据</button>
+    </view>
+  </view>
+</view>
